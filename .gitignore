@@ -25,3 +25,20 @@ Thumbs.db
 
 # Notebooks
 .ipynb_checkpoints/
+
+# Common Ignores
+node_modules/
+dist/
+build/
+.npm/
+*.pyc
+*.pyo
+__pycache__/
+
+# Environments
+venv/
+.venv/
+env/
+.env
+.env.*
+!.env.example

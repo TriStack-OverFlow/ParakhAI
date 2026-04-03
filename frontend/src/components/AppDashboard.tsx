@@ -9,6 +9,8 @@ gsap.registerPlugin(ScrollTrigger);
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
 export default function ParallaxDashboard() {
+  const [user] = useState<{name?: string, picture?: string, email?: string}>(() => { try { return JSON.parse(localStorage.getItem('user') || '{}'); } catch (e) { return {}; } });
+
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
@@ -118,6 +120,12 @@ export default function ParallaxDashboard() {
 
   return (
     <div ref={containerRef} className="w-full relative flex flex-col gap-[30vh] pb-[20vh] pt-[15vh]">
+      {user.name && (
+        <div className="fixed top-8 right-8 z-[100] flex items-center gap-4 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
+          <img src={user.picture} alt="" className="w-8 h-8 rounded-full" />
+          <span className="text-white font-medium text-sm">Welcome, {user.name}</span>
+        </div>
+      )}
       <canvas 
         ref={canvasRef} 
         className="fixed top-0 left-0 w-full h-screen object-cover z-0 pointer-events-none opacity-60 mix-blend-screen mix-blend-lighten"

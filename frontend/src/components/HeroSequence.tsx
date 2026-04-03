@@ -73,13 +73,15 @@ const HeroSequence: React.FC = () => {
     images[0].onload = render;
 
     // Let's create the master timeline
-    // This timeline scales exactly across the 500vh minus 100vh window size.
+    // Using GSAP's pin: true creates a foolproof Apple-style scrolling lock
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
         start: 'top top',
-        end: 'bottom bottom',
+        end: '+=400%', // Scrolls for 4x the screen height while locked
         scrub: 1.2, // Gives the Apple-like smooth momentum resistance
+        pin: true, // This is the secret to guaranteed Apple sticky behavior
+        anticipatePin: 1
       }
     });
 
@@ -92,11 +94,11 @@ const HeroSequence: React.FC = () => {
       duration: 100 // Scale duration for easier mental mapping of time = frames
     }, 0);
 
-    // TEXT 1: Fades in early, fades out at frame 25
+    // TEXT 1: Fades in immediately and stays, fades out at frame 25
     tl.fromTo(text1Ref.current, 
-       { opacity: 0, y: 50 }, 
-       { opacity: 1, y: 0, duration: 10, ease: 'power2.out' }, 
-       5 // Start at frame 5
+       { opacity: 1, y: 0 }, 
+       { opacity: 1, y: 0, duration: 5, ease: 'none' }, 
+       0 // Start at frame 0
     )
     .to(text1Ref.current, { opacity: 0, y: -50, duration: 10, ease: 'power2.in' }, 25);
 
@@ -122,13 +124,11 @@ const HeroSequence: React.FC = () => {
   }, []);
 
   return (
-    <div ref={containerRef} className="relative w-full h-[500vh] bg-black select-none pointer-events-auto">
-      {/* Sticky section mapping to exactly 100vh of the viewable screen space */}
-      <div className="sticky top-0 w-full h-screen overflow-hidden bg-black">
-        <canvas
-          ref={canvasRef}
-          className="absolute inset-0 w-full h-full object-cover z-0"
-        />
+    <div ref={containerRef} className="relative w-full h-screen bg-black overflow-hidden select-none pointer-events-auto">
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full object-cover z-0"
+      />
 
         {/* Global Dark Gradient overlay mapping to add cinematic contrast beneath the text modules */}
         <div className="absolute inset-0 bg-black/40 pointer-events-none z-10" />
@@ -182,7 +182,6 @@ const HeroSequence: React.FC = () => {
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
           </svg>
         </div>
-      </div>
     </div>
   );
 };

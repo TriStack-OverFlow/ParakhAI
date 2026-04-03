@@ -4,7 +4,7 @@ body {
   background-color: #09090b;
   color: #ffffff;
   min-height: 100vh;
-  overflow-x: hidden;
+  
   -webkit-font-smoothing: antialiased;
 }
 

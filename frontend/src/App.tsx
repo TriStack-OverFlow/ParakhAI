@@ -48,7 +48,7 @@ function DefaultLayout() {
 
 function HeroLayout() {
   return (
-    <main className="w-full min-h-screen bg-black overflow-x-hidden selection:bg-cyan-500/30 text-white font-sans antialiased">
+    <main className="w-full min-h-screen bg-black selection:bg-cyan-500/30 text-white font-sans antialiased">
       <HeroSequence />
       
       <div className="w-full h-screen flex flex-col items-center justify-center bg-black relative z-20">

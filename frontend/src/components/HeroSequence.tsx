@@ -12,6 +12,8 @@ const HeroSequence: React.FC = () => {
   const text1Ref = useRef<HTMLDivElement>(null);
   const text2Ref = useRef<HTMLDivElement>(null);
   const text3Ref = useRef<HTMLDivElement>(null);
+  const text4Ref = useRef<HTMLDivElement>(null);
+  const text5Ref = useRef<HTMLDivElement>(null);
 
   // Correct image count for the hero2 folder: 100 frames
   const frameCount = 100;
@@ -78,7 +80,7 @@ const HeroSequence: React.FC = () => {
       scrollTrigger: {
         trigger: containerRef.current,
         start: 'top top',
-        end: '+=400%', // Scrolls for 4x the screen height while locked
+        end: '+=800%', // Increased scroll total area to accommodate 5 sections smoothly
         scrub: 1.2, // Gives the Apple-like smooth momentum resistance
         pin: true, // This is the secret to guaranteed Apple sticky behavior
         anticipatePin: 1
@@ -91,30 +93,46 @@ const HeroSequence: React.FC = () => {
       snap: 'frame', // force snap to absolute integers
       ease: 'none',
       onUpdate: () => { requestAnimationFrame(render); },
-      duration: 100 // Scale duration for easier mental mapping of time = frames
+      duration: 200 // Use timeline base of 200 duration units
     }, 0);
 
-    // TEXT 1: Fades in immediately and stays, fades out at frame 25
+    // TEXT 1: Autonomous Few-shot anomaly
     tl.fromTo(text1Ref.current, 
        { opacity: 1, y: 0 }, 
-       { opacity: 1, y: 0, duration: 5, ease: 'none' }, 
+       { opacity: 1, y: 0, duration: 20, ease: 'none' }, 
        0 // Start at frame 0
     )
-    .to(text1Ref.current, { opacity: 0, y: -50, duration: 10, ease: 'power2.in' }, 25);
+    .to(text1Ref.current, { opacity: 0, y: -40, duration: 15, ease: 'power2.inOut' }, 20);
 
-    // TEXT 2: Fades in securely at frame 40, fades out at frame 65
+    // TEXT 2: The MSME Barrier
     tl.fromTo(text2Ref.current, 
        { opacity: 0, scale: 0.9 }, 
-       { opacity: 1, scale: 1, duration: 10, ease: 'power2.out' }, 
-       40
+       { opacity: 1, scale: 1, duration: 15, ease: 'power2.out' }, 
+       45
     )
-    .to(text2Ref.current, { opacity: 0, scale: 1.1, duration: 10, ease: 'power2.in' }, 65);
+    .to(text2Ref.current, { opacity: 0, scale: 1.1, duration: 15, ease: 'power2.in' }, 75);
 
-    // TEXT 3: Last dramatic float up as we approach end
+    // TEXT 3: The 60-second Solution
     tl.fromTo(text3Ref.current, 
+       { opacity: 0, y: 50 }, 
+       { opacity: 1, y: 0, duration: 15, ease: 'power2.out' }, 
+       100
+    )
+    .to(text3Ref.current, { opacity: 0, y: -50, duration: 15, ease: 'power2.in' }, 130);
+
+    // TEXT 4: Patch-level representation learning
+    tl.fromTo(text4Ref.current, 
+       { opacity: 0, scale: 0.95 }, 
+       { opacity: 1, scale: 1, duration: 15, ease: 'power2.out' }, 
+       150
+    )
+    .to(text4Ref.current, { opacity: 0, scale: 1.05, duration: 15, ease: 'power2.in' }, 175);
+
+    // TEXT 5: The final summary overlay at the end
+    tl.fromTo(text5Ref.current, 
        { opacity: 0, y: 80 }, 
        { opacity: 1, y: 0, duration: 15, ease: 'power3.out' }, 
-       80
+       185
     );
 
     return () => {
@@ -133,35 +151,59 @@ const HeroSequence: React.FC = () => {
         {/* Global Dark Gradient overlay mapping to add cinematic contrast beneath the text modules */}
         <div className="absolute inset-0 bg-black/40 pointer-events-none z-10" />
 
-        {/* Title Overlay 1 */}
+        {/* Overlay 1: Intro */}
         <div ref={text1Ref} className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20 opacity-0 px-6">
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-10 md:p-14 shadow-2xl flex flex-col items-center">
-            <h1 className="text-4xl md:text-6xl font-semibold tracking-tight text-white mb-4 shadow-black drop-shadow-xl text-center">
-              Autonomous Few-Shot Anomaly Detection
+          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-10 md:p-14 shadow-2xl flex flex-col items-center text-center">
+            <h1 className="text-4xl md:text-6xl max-w-5xl font-semibold tracking-tight text-white mb-4 shadow-black drop-shadow-xl">
+              Autonomous Few-Shot Anomaly Detection Framework
             </h1>
-            <p className="text-xl md:text-2xl text-white max-w-3xl text-center font-medium leading-relaxed drop-shadow-lg">
-              Empowering Micro-Manufacturing Systems with AI.
+            <p className="text-xl md:text-2xl text-white max-w-3xl font-medium leading-relaxed drop-shadow-lg">
+              Empowering Indian Micro-Manufacturing Systems with Edge AI.
             </p>
           </div>
         </div>
 
-        {/* Title Overlay 2 */}
+        {/* Overlay 2: The MSME Barrier */}
         <div ref={text2Ref} className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20 opacity-0 px-6">
-          <div className="bg-zinc-900/30 backdrop-blur-lg border border-zinc-500/50 p-12 rounded-3xl shadow-[0_0_80px_rgba(0,0,0,0.8)] text-center text-white flex flex-col items-center">
-            <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 drop-shadow-2xl max-w-4xl">
+          <div className="bg-zinc-900/30 backdrop-blur-lg border border-red-500/30 p-12 rounded-3xl shadow-[0_0_80px_rgba(0,0,0,0.8)] text-center text-white flex flex-col items-center">
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-6 drop-shadow-2xl max-w-3xl text-red-50">
+              The Data Collection Barrier
+            </h2>
+            <p className="text-lg md:text-xl text-zinc-200 tracking-wide font-medium drop-shadow-lg max-w-4xl leading-relaxed text-center">
+              Conventional supervised deep learning requires thousands of labeled defect examples. In MSMEs producing small-batch, high-variability goods, the cost and time to curate datasets makes traditional AI impossible.
+            </p>
+          </div>
+        </div>
+
+        {/* Overlay 3: The Solution */}
+        <div ref={text3Ref} className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20 opacity-0 px-6">
+          <div className="bg-zinc-900/30 backdrop-blur-lg border border-emerald-500/40 p-12 rounded-3xl shadow-[0_0_80px_rgba(0,0,0,0.8)] text-center text-white flex flex-col items-center">
+            <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 drop-shadow-2xl max-w-4xl text-emerald-50">
               Calibrated in under 60 seconds.
             </h2>
             <p className="text-xl text-zinc-200 tracking-wide font-medium drop-shadow-lg max-w-2xl text-center">
-              Requires only 10 to 20 "Golden" perfect images. No massive defect datasets or manual labeling required.
+              A paradigm shift to normative modeling. By defining what "perfect" looks like with just 10 to 20 Golden images, the system identifies any deviation as a defect immediately.
             </p>
           </div>
         </div>
 
-        {/* Stats Row Overlay 3 */}
-        <div ref={text3Ref} className="absolute bottom-1/4 left-0 w-full flex flex-col items-center justify-center pointer-events-none z-20 opacity-0 px-6">
+        {/* Overlay 4: The Tech */}
+        <div ref={text4Ref} className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20 opacity-0 px-6">
+          <div className="bg-white/5 backdrop-blur-md border border-white/20 p-10 md:p-14 rounded-3xl shadow-2xl flex flex-col items-center text-center">
+            <h2 className="text-3xl md:text-5xl font-semibold tracking-tight text-white mb-6 drop-shadow-xl">
+              Unsupervised Representation Learning
+            </h2>
+            <p className="text-lg md:text-xl text-white max-w-4xl font-medium leading-relaxed drop-shadow-lg">
+              Leveraging state-of-the-art embedding networks—like PatchCore—to extract universal mid-level features (edges, corners, textures). It bypasses from-scratch training entirely, performing neighborhood aggregation to flag anomalous patches in real-time.
+            </p>
+          </div>
+        </div>
+
+        {/* Overlay 5: Stats summary row */}
+        <div ref={text5Ref} className="absolute bottom-1/4 left-0 w-full flex flex-col items-center justify-center pointer-events-none z-20 opacity-0 px-6">
           <div className="mb-10 text-center">
-            <h3 className="text-3xl md:text-5xl font-bold text-white drop-shadow-xl">Industry 5.0 Edge Deployment</h3>
-            <p className="text-lg text-zinc-300 mt-2 tracking-wide font-light max-w-2xl mx-auto">Bridging the gap for MSMEs with smart, localized processing and normative modeling.</p>
+            <h3 className="text-3xl md:text-5xl font-bold text-white drop-shadow-xl">Industry 5.0 Transformation</h3>
+            <p className="text-lg text-zinc-300 mt-2 tracking-wide font-light max-w-2xl mx-auto">Targeting the 30% GDP backbone &gt;200M employment sector to reach global quality parity.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl w-full">
             <div className="bg-black/60 backdrop-blur-xl border border-white/20 p-8 rounded-[2rem] flex flex-col px-10 shadow-2xl transition-transform hover:scale-105 duration-300 pointer-events-auto text-center items-center">

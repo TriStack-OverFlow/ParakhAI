@@ -42,6 +42,8 @@ class SessionMetadataResponse(BaseModel):
     score_p99: float
     created_at: str
     updated_at: str
+    # New optional field — None for classic single-class sessions
+    subclass_labels: Optional[List[str]] = None
 
 class DefectStatsResponse(BaseModel):
     defect_rate: float

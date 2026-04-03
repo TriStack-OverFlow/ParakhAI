@@ -27,7 +27,8 @@ def train_model(folder_path, session_name):
     
     with httpx.Client() as client:
         try:
-            response = client.post(url, data=data, files=files, timeout=60.0)
+            print("Note: If uploading 100+ images, please wait patiently (might take 2-3 minutes)...")
+            response = client.post(url, data=data, files=files, timeout=600.0)
             if response.status_code == 200:
                 print("SUCCESS!")
                 print(response.json())

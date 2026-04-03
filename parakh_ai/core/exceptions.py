@@ -1,3 +1,9 @@
+
+
+
+
+
+
 """
 Custom exceptions for ParakhAI.
 Provides specific error types to fail loudly instead of returning None.

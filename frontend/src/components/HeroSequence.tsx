@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -153,48 +154,48 @@ const HeroSequence: React.FC = () => {
 
         {/* Overlay 1: Intro */}
         <div ref={text1Ref} className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20 opacity-0 px-6">
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-10 md:p-14 shadow-2xl flex flex-col items-center text-center">
-            <h1 className="text-4xl md:text-6xl max-w-5xl font-semibold tracking-tight text-white mb-4 shadow-black drop-shadow-xl">
-              Autonomous Few-Shot Anomaly Detection Framework
+          <div className="flex flex-col items-center text-center">
+            <h1 className="text-7xl md:text-9xl max-w-5xl font-extrabold tracking-tighter text-white mb-6 shadow-black drop-shadow-2xl mix-blend-plus-lighter">
+              Parakh.AI
             </h1>
-            <p className="text-xl md:text-2xl text-white max-w-3xl font-medium leading-relaxed drop-shadow-lg">
-              Empowering Indian Micro-Manufacturing Systems with Edge AI.
+            <p className="text-2xl md:text-4xl text-zinc-300 max-w-3xl font-light leading-relaxed drop-shadow-lg tracking-wide">
+              The Next Evolution in Quality Intelligence
             </p>
           </div>
         </div>
 
-        {/* Overlay 2: The MSME Barrier */}
+        {/* Overlay 2: Scalability */}
         <div ref={text2Ref} className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20 opacity-0 px-6">
-          <div className="bg-zinc-900/30 backdrop-blur-lg border border-red-500/30 p-12 rounded-3xl shadow-[0_0_80px_rgba(0,0,0,0.8)] text-center text-white flex flex-col items-center">
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-6 drop-shadow-2xl max-w-3xl text-red-50">
-              The Data Collection Barrier
+          <div className="flex flex-col items-center text-center">
+            <h2 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 drop-shadow-2xl max-w-4xl text-white">
+              Built for Scale.
             </h2>
-            <p className="text-lg md:text-xl text-zinc-200 tracking-wide font-medium drop-shadow-lg max-w-4xl leading-relaxed text-center">
-              Conventional supervised deep learning requires thousands of labeled defect examples. In MSMEs producing small-batch, high-variability goods, the cost and time to curate datasets makes traditional AI impossible.
+            <p className="text-xl md:text-3xl text-zinc-300 tracking-wide font-light drop-shadow-lg max-w-3xl leading-relaxed text-center">
+              Seamlessly integrates with your existing manufacturing pipelines. Zero downtime deployment.
             </p>
           </div>
         </div>
 
-        {/* Overlay 3: The Solution */}
+        {/* Overlay 3: Precision */}
         <div ref={text3Ref} className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20 opacity-0 px-6">
-          <div className="bg-zinc-900/30 backdrop-blur-lg border border-emerald-500/40 p-12 rounded-3xl shadow-[0_0_80px_rgba(0,0,0,0.8)] text-center text-white flex flex-col items-center">
-            <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 drop-shadow-2xl max-w-4xl text-emerald-50">
-              Calibrated in under 60 seconds.
+          <div className="flex flex-col items-center text-center">
+            <h2 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 drop-shadow-2xl max-w-4xl text-white">
+              Absolute Precision.
             </h2>
-            <p className="text-xl text-zinc-200 tracking-wide font-medium drop-shadow-lg max-w-2xl text-center">
-              A paradigm shift to normative modeling. By defining what "perfect" looks like with just 10 to 20 Golden images, the system identifies any deviation as a defect immediately.
+            <p className="text-xl md:text-3xl text-zinc-300 tracking-wide font-light drop-shadow-lg max-w-3xl leading-relaxed text-center">
+              Detecting microscopic deviations in milliseconds with unparalleled accuracy.
             </p>
           </div>
         </div>
 
         {/* Overlay 4: The Tech */}
         <div ref={text4Ref} className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20 opacity-0 px-6">
-          <div className="bg-white/5 backdrop-blur-md border border-white/20 p-10 md:p-14 rounded-3xl shadow-2xl flex flex-col items-center text-center">
-            <h2 className="text-3xl md:text-5xl font-semibold tracking-tight text-white mb-6 drop-shadow-xl">
-              Unsupervised Representation Learning
+          <div className="flex flex-col items-center text-center">
+            <h2 className="text-5xl md:text-7xl font-bold tracking-tight text-cyan-400 mb-6 drop-shadow-xl">
+              Empower your Edge.
             </h2>
-            <p className="text-lg md:text-xl text-white max-w-4xl font-medium leading-relaxed drop-shadow-lg">
-              Leveraging state-of-the-art embedding networks—like PatchCore—to extract universal mid-level features (edges, corners, textures). It bypasses from-scratch training entirely, performing neighborhood aggregation to flag anomalous patches in real-time.
+            <p className="text-xl md:text-3xl text-zinc-300 max-w-4xl font-light leading-relaxed drop-shadow-lg tracking-wide">
+              Run continuous multi-model inference entirely locally, without sending sensitive factory data to the cloud.
             </p>
           </div>
         </div>
@@ -219,11 +220,15 @@ const HeroSequence: React.FC = () => {
               <span className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Edge-Ready</span>   
             </div>
           </div>
-        </div>
-
-        {/* Persistent Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center animate-bounce z-10 pointer-events-none opacity-80">
-          <span className="text-xs text-white uppercase tracking-[0.2em] mb-3 drop-shadow-md">Scroll to explore</span>
+            
+            <div className="flex gap-4 mt-12 pointer-events-auto">
+              <Link to="/login" className="px-10 py-5 bg-white text-black font-semibold rounded-full hover:scale-105 hover:bg-zinc-200 hover:text-black transition-all duration-300 uppercase tracking-widest text-sm shadow-[0_0_40px_rgba(255,255,255,0.2)]">
+                Log In
+              </Link>
+              <Link to="/register" className="px-10 py-5 bg-transparent border border-white text-white font-semibold rounded-full hover:scale-105 hover:bg-white/10 hover:text-white transition-all duration-300 uppercase tracking-widest text-sm">
+                Deploy Now
+              </Link>
+            </div>
           <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.8))' }}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
           </svg>

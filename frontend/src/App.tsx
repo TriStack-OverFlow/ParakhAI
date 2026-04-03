@@ -77,19 +77,6 @@ function HeroLayout() {
   return (
     <main className="w-full min-h-screen bg-black selection:bg-cyan-500/30 text-white font-sans antialiased">
       <HeroSequence />
-      
-      <div className="w-full h-screen flex flex-col items-center justify-center bg-black relative z-20">
-        <h2 className="text-4xl font-bold mb-4">Empower Your Production Line.</h2>
-        <p className="text-xl text-zinc-400 mb-10 max-w-2xl text-center">Transform quality control with our autonomous anomaly detection system. Edge-ready and zero-defect optimized.</p>
-        <div className="flex gap-4">
-          <Link to="/login" className="px-10 py-5 bg-white text-black font-semibold rounded-full hover:scale-105 hover:bg-zinc-200 hover:text-black transition-all duration-300 uppercase tracking-widest text-sm shadow-[0_0_40px_rgba(255,255,255,0.2)]">
-            Log In
-          </Link>
-          <Link to="/register" className="px-10 py-5 bg-transparent border border-white text-white font-semibold rounded-full hover:scale-105 hover:bg-white/10 hover:text-white transition-all duration-300 uppercase tracking-widest text-sm">
-            Deploy Now
-          </Link>
-        </div>
-      </div>
     </main>
   );
 }

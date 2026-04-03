@@ -234,18 +234,155 @@ class PatchCore(BaseAnomalyModel):
             results.append(self.predict(images[i:i+1]))
         return results
 
+    # ── Twist 1: Bounded Incremental Coreset Merge ────────────────────────
+    def accept_as_normal(
+        self,
+        image: torch.Tensor,
+        defect_bboxes: Optional[List[dict]] = None,
+        coverage_threshold: float = 0.01,
+        max_coreset_size: int = 5000,
+    ) -> dict:
+        """
+        Online learning: extract patches from the flagged region only,
+        admit only coverage-gap-filling patches into the coreset,
+        evict redundant points if over capacity, rebuild FAISS,
+        and recompute the threshold.
+
+        Args:
+            image: (C,H,W) or (1,C,H,W) tensor, preprocessed.
+            defect_bboxes: list of {x,y,w,h} dicts from inference.
+                           If provided, only extract patches from those regions.
+            coverage_threshold: min L2 distance for a new patch to be "novel".
+            max_coreset_size: hard cap on coreset cardinality.
+
+        Returns:
+            dict with merge statistics + new threshold.
+        """
+        if not self._is_fitted:
+            raise ParakhAIError("Model not fitted.")
+
+        if image.dim() == 3:
+            image = image.unsqueeze(0)
+
+        img_h, img_w = image.shape[2], image.shape[3]
+
+        # ── 1. Extract ALL patch features ────────────────────────────────
+        all_features = self.feature_extractor.extract_patches(image).cpu().numpy()
+        grid_h, grid_w = self.feature_extractor.get_patch_grid_size(img_h)
+
+        # ── 2. If bboxes provided, only take patches overlapping them ────
+        if defect_bboxes and len(defect_bboxes) > 0:
+            # Convert bbox pixel coords to patch-grid coords
+            scale_y = grid_h / img_h
+            scale_x = grid_w / img_w
+            selected_indices = set()
+            for bbox in defect_bboxes:
+                bx, by, bw, bh = bbox.get('x',0), bbox.get('y',0), bbox.get('w',img_w), bbox.get('h',img_h)
+                gy_start = max(0, int(by * scale_y))
+                gy_end   = min(grid_h, int((by + bh) * scale_y) + 1)
+                gx_start = max(0, int(bx * scale_x))
+                gx_end   = min(grid_w, int((bx + bw) * scale_x) + 1)
+                for gy in range(gy_start, gy_end):
+                    for gx in range(gx_start, gx_end):
+                        selected_indices.add(gy * grid_w + gx)
+            if selected_indices:
+                idx = sorted(selected_indices)
+                new_patches = all_features[idx]
+            else:
+                new_patches = all_features
+        else:
+            new_patches = all_features
+
+        old_coreset_size = self.coreset_sampler.index.ntotal
+
+        # ── 3. Bounded merge (coverage check + eviction) ─────────────────
+        merge_stats = self.coreset_sampler.add_with_coverage_check(
+            new_patches,
+            coverage_threshold=coverage_threshold,
+            max_coreset_size=max_coreset_size,
+        )
+
+        # ── 4. Recompute threshold ───────────────────────────────────────
+        # Re-score this accepted image against the updated coreset
+        dists_new, _ = self.coreset_sampler.search(all_features, k=1)
+        new_raw = float(np.max(dists_new.squeeze(-1)))
+        new_z = (new_raw - self.score_mean) / (self.score_std + 1e-6)
+        new_z = max(0.0, new_z)
+
+        # If the accepted image still scores above threshold after merge,
+        # widen the distribution so it passes with 5% margin
+        if new_z >= self.z_threshold:
+            target_z = self.z_threshold * 0.90  # place it comfortably inside
+            target_raw = self.score_mean + target_z * (self.score_std + 1e-6)
+            # Widen σ so that new_raw → target_z
+            self.score_std = max(self.score_std, (new_raw - self.score_mean) / (target_z + 1e-6))
+            self.threshold = self.score_mean + self.z_threshold * (self.score_std + 1e-6)
+
+        # Track feedback count
+        self._feedback_count = getattr(self, '_feedback_count', 0) + 1
+
+        logger.info(
+            "Accept-as-Normal: offered=%d admitted=%d evicted=%d "
+            "coreset=%d→%d new_z=%.3f threshold=%.4f feedback_count=%d",
+            merge_stats['patches_offered'], merge_stats['patches_admitted'],
+            merge_stats['patches_evicted'], old_coreset_size,
+            merge_stats['coreset_size'], new_z, self.threshold,
+            self._feedback_count
+        )
+
+        return {
+            **merge_stats,
+            "old_coreset_size": old_coreset_size,
+            "new_z_score": round(float(new_z), 4),
+            "new_threshold": round(float(self.threshold), 6),
+            "new_mean": round(float(self.score_mean), 6),
+            "new_std": round(float(self.score_std), 6),
+            "feedback_count": self._feedback_count,
+        }
+
+    # ── Twist 2: Domain Drift Detection ───────────────────────────────────
+    def record_inference(self, z_score: float) -> dict:
+        """
+        Track Z-scores in a 10-sample sliding window.
+
+        Drift rule: if window_mean > 2.0 AND window_std < 0.5
+        for 5+ samples, the product line has changed.
+        """
+        if not hasattr(self, '_z_window'):
+            self._z_window = []
+
+        self._z_window.append(z_score)
+        if len(self._z_window) > 10:
+            self._z_window = self._z_window[-10:]
+
+        drift_status = "normal"
+        w_mean = float(np.mean(self._z_window))
+        w_std  = float(np.std(self._z_window))
+
+        if len(self._z_window) >= 5 and w_mean > 2.0 and w_std < 0.5:
+            drift_status = "domain_shift"
+
+        return {
+            "drift_status": drift_status,
+            "window_mean": round(w_mean, 3),
+            "window_std": round(w_std, 3),
+            "window_size": len(self._z_window),
+        }
+
     def save(self, save_dir: Path) -> None:
         save_dir.mkdir(parents=True, exist_ok=True)
         self.coreset_sampler.save(save_dir / "model.faiss")
         
         state = {
-            "threshold":   self.threshold,
-            "score_p50":   self.score_p50,
-            "score_p99":   self.score_p99,
-            "score_mean":  getattr(self, 'score_mean', self.score_p50),
-            "score_std":   getattr(self, 'score_std', max(self.score_p99 - self.score_p50, 1e-6)),
-            "z_threshold": getattr(self, 'z_threshold', 3.0),
-            "session_id":  self.session_id,
+            "threshold":      self.threshold,
+            "score_p50":      self.score_p50,
+            "score_p99":      self.score_p99,
+            "score_mean":     getattr(self, 'score_mean', self.score_p50),
+            "score_std":      getattr(self, 'score_std', max(self.score_p99 - self.score_p50, 1e-6)),
+            "z_threshold":    getattr(self, 'z_threshold', 3.0),
+            "session_id":     self.session_id,
+            "feedback_count": getattr(self, '_feedback_count', 0),
+            "z_window":       getattr(self, '_z_window', []),
         }
         with open(save_dir / "model_state.pkl", "wb") as f:
             pickle.dump(state, f)
@@ -259,14 +396,16 @@ class PatchCore(BaseAnomalyModel):
         with open(save_dir / "model_state.pkl", "rb") as f:
             state = pickle.load(f)
             
-        self.threshold   = state["threshold"]
-        self.score_p50   = state["score_p50"]
-        self.score_p99   = state["score_p99"]
-        self.score_mean  = state.get("score_mean",  self.score_p50)
-        self.score_std   = state.get("score_std",   max(self.score_p99 - self.score_p50, 1e-6))
-        self.z_threshold = state.get("z_threshold", 3.0)
-        self.session_id  = state.get("session_id",  "default")
-        self._is_fitted  = True
+        self.threshold       = state["threshold"]
+        self.score_p50       = state["score_p50"]
+        self.score_p99       = state["score_p99"]
+        self.score_mean      = state.get("score_mean",  self.score_p50)
+        self.score_std       = state.get("score_std",   max(self.score_p99 - self.score_p50, 1e-6))
+        self.z_threshold     = state.get("z_threshold", 3.0)
+        self.session_id      = state.get("session_id",  "default")
+        self._feedback_count = state.get("feedback_count", 0)
+        self._z_window       = state.get("z_window", [])
+        self._is_fitted      = True
 
 
 # ---------------------------------------------------------------------------

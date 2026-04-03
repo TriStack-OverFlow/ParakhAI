@@ -26,6 +26,9 @@ class InferenceResponse:
     defect_bboxes: List[BBox]
     inference_time_ms: float
     model_version: str
+    drift_status: str = 'normal'
+    drift_window_mean: float = 0.0
+    drift_window_std: float = 0.0
 
 class InferencePipeline:
     def __init__(self, model_store: ModelStore, defect_log: DefectLog):
@@ -118,6 +121,15 @@ class InferencePipeline:
             inference_time_ms=result.inference_time_ms,
             model_version=metadata.model_type
         )
+
+        # ── Twist 2: Record Z-score for drift detection ────────────────────
+        if hasattr(model, 'record_inference'):
+            drift = model.record_inference(result.anomaly_score)
+            response.drift_status = drift['drift_status']
+            response.drift_window_mean = drift['window_mean']
+            response.drift_window_std = drift['window_std']
+            # Important: save the model so the _z_window sliding list persists!
+            model.save(self.model_store.storage_dir / session_id)
         
         if log_result:
             self.defect_log.log_inspection(response)

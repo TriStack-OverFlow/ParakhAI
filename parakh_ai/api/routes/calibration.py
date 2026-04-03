@@ -235,13 +235,15 @@ async def finalize_subclass_calibration(
     }
 
 
+import json
+
 @router.get("/{task_id}/progress")
 async def get_progress(task_id: str):
     async def event_generator():
         while True:
             if task_id in _progress:
                 data = _progress[task_id]
-                yield {"data": str(data)}
+                yield {"data": json.dumps(data)}
                 if data["status"] in ["done", "error"]:
                     break
             await asyncio.sleep(0.5)

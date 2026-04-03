@@ -101,3 +101,77 @@ class CoresetSampler:
         if not path.exists():
             raise ParakhAIError(f"FAISS index file {path} not found.")
         self.index = faiss.read_index(str(path))
+
+    def add_with_coverage_check(
+        self,
+        new_patches: np.ndarray,
+        coverage_threshold: float = 0.01,
+        max_coreset_size: int = 5000,
+    ) -> dict:
+        """
+        Bounded Incremental Coreset Merge.
+
+        For each new patch, check if its nearest-neighbor distance to the
+        existing coreset exceeds `coverage_threshold`.  If yes → the patch
+        fills a genuine coverage gap and is admitted.  If no → it is
+        redundant and skipped.
+
+        After insertion, if the coreset exceeds `max_coreset_size`, the
+        most redundant existing point (smallest max-distance to its
+        neighbors) is evicted.
+
+        Finally the FAISS FlatL2 index is rebuilt in-place.
+
+        Returns dict with insertion statistics.
+        """
+        if self.index is None:
+            raise ParakhAIError("FAISS index not built.")
+
+        new_patches = new_patches.astype(np.float32)
+        old_size = self.index.ntotal
+        dim = self.index.d
+
+        # ── 1. Coverage-gap filtering ─────────────────────────────────────
+        dists, _ = self.index.search(new_patches, 1)  # (N_new, 1)
+        dists = dists.squeeze(-1)                      # (N_new,)
+        mask = dists > coverage_threshold
+        novel_patches = new_patches[mask]
+
+        if len(novel_patches) == 0:
+            return {
+                "patches_offered": int(len(new_patches)),
+                "patches_admitted": 0,
+                "patches_evicted": 0,
+                "coreset_size": old_size,
+            }
+
+        # ── 2. Reconstruct full coreset + append novel patches ────────────
+        existing = np.zeros((old_size, dim), dtype=np.float32)
+        for i in range(old_size):
+            existing[i] = self.index.reconstruct(i)
+
+        merged = np.vstack([existing, novel_patches])
+
+        # ── 3. Bounded eviction — remove most redundant points ────────────
+        evicted = 0
+        while len(merged) > max_coreset_size:
+            # Build temp index to find 2-NN (self + nearest other)
+            tmp = faiss.IndexFlatL2(dim)
+            tmp.add(merged)
+            d2, _ = tmp.search(merged, 2)  # (M, 2) — col 0 is self (dist=0)
+            nn_dists = d2[:, 1]            # distance to nearest *other* point
+            # The most redundant = smallest nn distance
+            victim = int(np.argmin(nn_dists))
+            merged = np.delete(merged, victim, axis=0)
+            evicted += 1
+
+        # ── 4. Rebuild FAISS index in-place ───────────────────────────────
+        self.index = faiss.IndexFlatL2(dim)
+        self.index.add(merged)
+
+        return {
+            "patches_offered": int(len(new_patches)),
+            "patches_admitted": int(len(novel_patches)),
+            "patches_evicted": evicted,
+            "coreset_size": self.index.ntotal,
+        }

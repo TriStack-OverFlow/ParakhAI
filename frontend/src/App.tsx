@@ -30,11 +30,11 @@ function DefaultLayout() {
           </div>
         </header>
 
-        <section className="relative w-full max-w-6xl mx-auto pt-32 px-6 pb-32 z-20">
+        <section className="relative w-full z-20">
           <AppDashboard />
         </section>
 
-        <footer className="w-full max-w-6xl mx-auto py-12 px-6 border-t border-zinc-800/50 text-center text-zinc-500 text-sm flex justify-between items-center relative z-20 bg-zinc-950/20 backdrop-blur-xl">
+        <footer className="w-full max-w-6xl mx-auto px-6 py-8 border-t border-zinc-800/50 text-center text-zinc-500 text-sm flex justify-between items-center relative z-20 bg-zinc-950/20 backdrop-blur-xl">
           <span>© 2026 ParakhAI Micro-Manufacturing. All rights reserved.</span>
           <div className="space-x-6 text-xs uppercase tracking-widest font-mono">
             <a href="#" className="hover:text-cyan-400 transition">Docs</a>

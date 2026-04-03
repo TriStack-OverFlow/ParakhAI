@@ -52,9 +52,10 @@ function HeroLayout() {
       <HeroSequence />
       
       <div className="w-full h-screen flex flex-col items-center justify-center bg-black relative z-20">
-        <h2 className="text-4xl font-bold mb-8">Ready to Inspect?</h2>
-        <Link to="/dashboard" className="px-8 py-4 bg-white text-black font-semibold rounded-full hover:scale-105 transition-transform uppercase tracking-widest text-sm">
-          Launch Dashboard
+        <h2 className="text-4xl font-bold mb-4">Empower Your Production Line.</h2>
+        <p className="text-xl text-zinc-400 mb-10 max-w-2xl text-center">Transform quality control with our autonomous anomaly detection system. Edge-ready and zero-defect optimized.</p>
+        <Link to="/dashboard" className="px-10 py-5 bg-white text-black font-semibold rounded-full hover:scale-105 hover:bg-cyan-400 hover:text-black transition-all duration-300 uppercase tracking-widest text-sm shadow-[0_0_40px_rgba(34,211,238,0.2)]">
+          Start Demo
         </Link>
       </div>
     </main>

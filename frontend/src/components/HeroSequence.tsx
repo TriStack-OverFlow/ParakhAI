@@ -136,11 +136,11 @@ const HeroSequence: React.FC = () => {
         {/* Title Overlay 1 */}
         <div ref={text1Ref} className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20 opacity-0 px-6">
           <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-10 md:p-14 shadow-2xl flex flex-col items-center">
-            <h1 className="text-5xl md:text-7xl font-semibold tracking-tight text-white mb-4 shadow-black drop-shadow-xl text-center">
-              Zero-Defect Standard
+            <h1 className="text-4xl md:text-6xl font-semibold tracking-tight text-white mb-4 shadow-black drop-shadow-xl text-center">
+              Autonomous Few-Shot Anomaly Detection
             </h1>
-            <p className="text-xl md:text-2xl text-white max-w-2xl text-center font-medium leading-relaxed drop-shadow-lg">
-              Few-Shot Visual Quality Inspection System.
+            <p className="text-xl md:text-2xl text-white max-w-3xl text-center font-medium leading-relaxed drop-shadow-lg">
+              Empowering Micro-Manufacturing Systems with AI.
             </p>
           </div>
         </div>
@@ -148,28 +148,32 @@ const HeroSequence: React.FC = () => {
         {/* Title Overlay 2 */}
         <div ref={text2Ref} className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20 opacity-0 px-6">
           <div className="bg-zinc-900/30 backdrop-blur-lg border border-zinc-500/50 p-12 rounded-3xl shadow-[0_0_80px_rgba(0,0,0,0.8)] text-center text-white flex flex-col items-center">
-            <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 drop-shadow-2xl">
-              Calibrated in 60s
+            <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 drop-shadow-2xl max-w-4xl">
+              Calibrated in under 60 seconds.
             </h2>
-            <p className="text-xl text-zinc-200 tracking-wide font-medium drop-shadow-lg max-w-md">
-              Without a single defect sample. Built entirely on regular production captures.
+            <p className="text-xl text-zinc-200 tracking-wide font-medium drop-shadow-lg max-w-2xl text-center">
+              Requires only 10 to 20 "Golden" perfect images. No massive defect datasets or manual labeling required.
             </p>
           </div>
         </div>
 
         {/* Stats Row Overlay 3 */}
         <div ref={text3Ref} className="absolute bottom-1/4 left-0 w-full flex flex-col items-center justify-center pointer-events-none z-20 opacity-0 px-6">
+          <div className="mb-10 text-center">
+            <h3 className="text-3xl md:text-5xl font-bold text-white drop-shadow-xl">Industry 5.0 Edge Deployment</h3>
+            <p className="text-lg text-zinc-300 mt-2 tracking-wide font-light max-w-2xl mx-auto">Bridging the gap for MSMEs with smart, localized processing and normative modeling.</p>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl w-full">
             <div className="bg-black/60 backdrop-blur-xl border border-white/20 p-8 rounded-[2rem] flex flex-col px-10 shadow-2xl transition-transform hover:scale-105 duration-300 pointer-events-auto text-center items-center">
-              <span className="text-sm uppercase tracking-[0.2em] text-cyan-400 font-bold mb-2">Detection</span>
-              <span className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Unsupervised</span>
+              <span className="text-sm uppercase tracking-[0.2em] text-cyan-400 font-bold mb-2">Approach</span>
+              <span className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Normative</span>
             </div>
             <div className="bg-black/60 backdrop-blur-xl border border-white/20 p-8 rounded-[2rem] flex flex-col px-10 shadow-xl transition-transform hover:scale-105 duration-300 pointer-events-auto text-center items-center">
               <span className="text-sm uppercase tracking-[0.2em] text-amber-500 font-bold mb-2">Inference</span>
               <span className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Real-Time</span>
             </div>
             <div className="bg-black/60 backdrop-blur-xl border border-white/20 p-8 rounded-[2rem] flex flex-col px-10 shadow-xl transition-transform hover:scale-105 duration-300 pointer-events-auto text-center items-center">
-              <span className="text-sm uppercase tracking-[0.2em] text-emerald-500 font-bold mb-2">Architecture</span>
+              <span className="text-sm uppercase tracking-[0.2em] text-emerald-500 font-bold mb-2">Hardware</span>
               <span className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Edge-Ready</span>   
             </div>
           </div>

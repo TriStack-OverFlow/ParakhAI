@@ -3,6 +3,9 @@ import { BrowserRouter, Routes, Route, Link, Outlet, useLocation } from 'react-r
 import HeroSequence from './components/HeroSequence';
 import AppDashboard from './components/AppDashboard';
 import Footer from './components/Footer';
+import Login from './components/Login';
+import Register from './components/Register';
+import ChatbotWidget from './components/ChatbotWidget';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -78,9 +81,14 @@ function HeroLayout() {
       <div className="w-full h-screen flex flex-col items-center justify-center bg-black relative z-20">
         <h2 className="text-4xl font-bold mb-4">Empower Your Production Line.</h2>
         <p className="text-xl text-zinc-400 mb-10 max-w-2xl text-center">Transform quality control with our autonomous anomaly detection system. Edge-ready and zero-defect optimized.</p>
-        <Link to="/dashboard" className="px-10 py-5 bg-white text-black font-semibold rounded-full hover:scale-105 hover:bg-cyan-400 hover:text-black transition-all duration-300 uppercase tracking-widest text-sm shadow-[0_0_40px_rgba(34,211,238,0.2)]">
-          Start Demo
-        </Link>
+        <div className="flex gap-4">
+          <Link to="/login" className="px-10 py-5 bg-white text-black font-semibold rounded-full hover:scale-105 hover:bg-zinc-200 hover:text-black transition-all duration-300 uppercase tracking-widest text-sm shadow-[0_0_40px_rgba(255,255,255,0.2)]">
+            Log In
+          </Link>
+          <Link to="/register" className="px-10 py-5 bg-transparent border border-white text-white font-semibold rounded-full hover:scale-105 hover:bg-white/10 hover:text-white transition-all duration-300 uppercase tracking-widest text-sm">
+            Deploy Now
+          </Link>
+        </div>
       </div>
     </main>
   );
@@ -92,8 +100,10 @@ function App() {
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<HeroLayout />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route element={<DefaultLayout />}>
-          <Route path="/dashboard" element={<AppDashboard />} />
+          <Route path="/dashboard" element={<><AppDashboard /><ChatbotWidget /></>} />
           <Route path="/docs" element={<DocsPage />} />
           <Route path="/status" element={<StatusPage />} />
           <Route path="*" element={<AppDashboard />} />

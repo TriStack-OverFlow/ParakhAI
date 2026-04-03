@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from typing import List
+from typing import List, Annotated
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Body
 
 from parakh_ai.api.schemas import InferenceResponseModel

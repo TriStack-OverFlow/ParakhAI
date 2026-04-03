@@ -157,6 +157,10 @@ class PatchCore(BaseAnomalyModel):
         # Limit to [0, ~] and clamp minimum to 0
         normalized_score = max(0.0, float(normalized_score))
         
+        # Normalize the map using the exact same scaling so heatmap operates correctly
+        normalized_map = (anomaly_map - self.score_p50) / range_val
+        normalized_map = np.clip(normalized_map, 0.0, None)
+        
         is_defective = normalized_score > 1.0
         confidence = normalized_score - 1.0 # Positive means defective
         
@@ -166,8 +170,8 @@ class PatchCore(BaseAnomalyModel):
             anomaly_score=normalized_score,
             is_defective=is_defective,
             confidence=confidence,
-            anomaly_map=anomaly_map,
-            patch_scores=anomaly_map.copy(),
+            anomaly_map=normalized_map,
+            patch_scores=normalized_map.copy(),
             inference_time_ms=inf_time,
             threshold_used=1.0 # Due to normalization, effective threshold is 1.0
         )

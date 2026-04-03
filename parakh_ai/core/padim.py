@@ -166,6 +166,9 @@ class PaDiM(BaseAnomalyModel):
         normalized_score = (raw_score - self.score_p50) / range_val
         normalized_score = max(0.0, float(normalized_score))
         
+        normalized_map = (anomaly_map - self.score_p50) / range_val
+        normalized_map = np.clip(normalized_map, 0.0, None)
+        
         is_defective = normalized_score > 1.0
         confidence = normalized_score - 1.0
         
@@ -175,8 +178,8 @@ class PaDiM(BaseAnomalyModel):
             anomaly_score=normalized_score,
             is_defective=is_defective,
             confidence=confidence,
-            anomaly_map=anomaly_map,
-            patch_scores=anomaly_map.copy(),
+            anomaly_map=normalized_map,
+            patch_scores=normalized_map.copy(),
             inference_time_ms=inf_time,
             threshold_used=1.0
         )

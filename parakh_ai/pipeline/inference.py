@@ -57,7 +57,8 @@ class InferencePipeline:
         severity = 'PASS'
         
         if generate_heatmap_img:
-            hm_res = generate_heatmap(image, result.anomaly_map)
+            # Anomaly map is normalized so fail_threshold is consistently 1.0
+            hm_res = generate_heatmap(image, result.anomaly_map, warn_threshold=0.5, fail_threshold=1.0)
             severity = hm_res.severity
             defect_bboxes = hm_res.defect_bboxes
             

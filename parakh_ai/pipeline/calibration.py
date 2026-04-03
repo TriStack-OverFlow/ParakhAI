@@ -1,5 +1,6 @@
 import logging
 import cv2
+import numpy as np
 import torch
 from pathlib import Path
 from typing import List, Callable, Optional, Dict
@@ -10,6 +11,7 @@ from parakh_ai.pipeline.preprocessing import Preprocessor
 from parakh_ai.core.patchcore import PatchCore
 from parakh_ai.core.padim import PaDiM
 from parakh_ai.core.exceptions import CalibrationError
+from parakh_ai.storage.model_store import ModelStore, SessionMetadata
 
 logger = logging.getLogger(__name__)
 
@@ -20,8 +22,8 @@ class CalibrationSession:
         self.model = model
 
 class CalibrationPipeline:
-    def __init__(self, model_store_dir: str = "data/models/"):
-        self.model_store_dir = Path(model_store_dir)
+    def __init__(self, store: Optional[ModelStore] = None):
+        self.store = store or ModelStore()
         
     def _validate_input(self, images: List[np.ndarray]):
         if len(images) < 5:
@@ -82,9 +84,18 @@ class CalibrationPipeline:
         
         report(0.95, "Threshold calibrated. Model is ready.")
         
-        # Save model (simplified here, full ModelStore in phase 3)
-        session_dir = self.model_store_dir / session_id
-        model.save(session_dir)
+        from datetime import datetime
+        meta = SessionMetadata(
+            session_id=session_id,
+            model_type=model_type,
+            backbone="wideresnet50",
+            coreset_ratio=coreset_ratio,
+            threshold=float(model.threshold) if hasattr(model, 'threshold') else 0.0,
+            score_p50=float(model.score_p50) if hasattr(model, 'score_p50') else 0.0,
+            score_p99=float(model.score_p99) if hasattr(model, 'score_p99') else 0.0,
+            created_at=datetime.utcnow().isoformat()
+        )
+        self.store.save_session(session_id, model, meta)
         
         report(1.00, "Calibration session saved successfully.")
         

@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from typing import List
+from typing import List, Annotated
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, BackgroundTasks
 from sse_starlette.sse import EventSourceResponse
 import asyncio

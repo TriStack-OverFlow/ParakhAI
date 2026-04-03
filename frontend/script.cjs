@@ -1,5 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
-import { Camera, RefreshCw, Layers, Activity } from 'lucide-react';
+const fs = require('fs');
+
+const fileContent = `import { useEffect, useRef, useState } from 'react';
+import { Camera, RefreshCw, Layers, Activity, BrainCircuit } from 'lucide-react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import axios from 'axios';
@@ -80,7 +82,7 @@ function CalibrationView() {
     
     setIsCalibrating(true);
     try {
-      const res = await axios.post(`${API_URL}/calibrate`, formData, {
+      const res = await axios.post(\`\${API_URL}/calibrate\`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       if (res.data?.task_id) setTaskId(res.data.task_id);
@@ -146,13 +148,13 @@ function InferenceView() {
     try {
       if (testImages.length === 1) {
         formData.append('file', testImages[0]);
-        const res = await axios.post(`${API_URL}/infer`, formData, {
+        const res = await axios.post(\`\${API_URL}/infer\`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         setResult(res.data);
       } else {
         testImages.forEach(img => formData.append('files', img));
-        const res = await axios.post(`${API_URL}/infer/batch`, formData, {
+        const res = await axios.post(\`\${API_URL}/infer/batch\`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         // Mock fallback or batch result parse
@@ -209,15 +211,16 @@ function InferenceView() {
               {result?.defect_bboxes && imgRef.current && result.defect_bboxes.map((box: any, i: number) => {
                 // Calculate display scale ratio against natural image size
                 const displayScaleX = imgRef.current!.width / imgRef.current!.naturalWidth || 1;
+                const displayScaleY = imgRef.current!.height / imgRef.current!.naturalHeight || 1;
                 const naturalRatio = imgRef.current!.complete ? displayScaleX : 1; 
 
                 // Box coordinates scaled to CSS drawn box overlay!
                 return (
                   <div key={i} className="absolute border-2 border-red-500 bg-red-500/20 z-20 pointer-events-none animate-pulse shadow-[0_0_20px_rgba(239,68,68,0.6)]" style={{
-                    left: `calc(50% - ${imgRef.current!.width / 2}px + ${box.x * naturalRatio}px)`,
-                    top: `calc(50% - ${imgRef.current!.height / 2}px + ${box.y * naturalRatio}px)`,
-                    width: `${Math.max(box.w * naturalRatio, 20)}px`,
-                    height: `${Math.max(box.h * naturalRatio, 20)}px`,
+                    left: \`calc(50% - \${imgRef.current!.width / 2}px + \${box.x * naturalRatio}px)\`,
+                    top: \`calc(50% - \${imgRef.current!.height / 2}px + \${box.y * naturalRatio}px)\`,
+                    width: \`\${Math.max(box.w * naturalRatio, 20)}px\`,
+                    height: \`\${Math.max(box.h * naturalRatio, 20)}px\`,
                   }}>
                     <span className="absolute -top-6 left-0 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow">DEFECT</span>
                   </div>
@@ -232,13 +235,13 @@ function InferenceView() {
           {isLoading && <Activity className="w-12 h-12 text-rose-500 animate-spin" />}
           {result && !isLoading && (
             <div className="text-center w-full">
-              <h3 className={`text-4xl font-extrabold mb-4 uppercase tracking-widest ${result.severity === 'FAIL' || result.is_defective ? 'text-red-500' : 'text-green-500'}`}>
+              <h3 className={\`text-4xl font-extrabold mb-4 uppercase tracking-widest \${result.severity === 'FAIL' || result.is_defective ? 'text-red-500' : 'text-green-500'}\`}>
                 {result.severity || (result.is_defective ? 'FAIL' : 'PASS')}
               </h3>
               <p className="text-6xl font-mono text-white mb-6">{(result.anomaly_score || 0).toFixed(2)}</p>
               
               {result.heatmap_b64 ? (
-                <img src={`data:image/jpeg;base64,${result.heatmap_b64}`} className="w-full h-64 object-cover rounded-xl border border-red-500/30 mix-blend-screen" alt="Heatmap"/>
+                <img src={\`data:image/jpeg;base64,\${result.heatmap_b64}\`} className="w-full h-64 object-cover rounded-xl border border-red-500/30 mix-blend-screen" alt="Heatmap"/>
               ) : (
                  <div className="w-full h-64 bg-zinc-950 flex flex-col items-center justify-center border border-zinc-800 rounded-xl">
                    {result.defect_bboxes ? 
@@ -267,7 +270,7 @@ function SessionsView() {
 
   const fetchSessions = async () => {
     try {
-      const res = await axios.get(`${API_URL}/sessions`);
+      const res = await axios.get(\`\${API_URL}/sessions\`);
       if(Array.isArray(res.data)) setSessions(res.data);
     } catch {
       setSessions([{ session_id: 'Metal_Gear_A', num_images: 15, thresholds: { defect: 14.5 } }]);
@@ -276,7 +279,7 @@ function SessionsView() {
 
   const deleteSession = async (id: string) => {
     try {
-      await axios.delete(`${API_URL}/sessions/${id}`);
+      await axios.delete(\`\${API_URL}/sessions/\${id}\`);
       fetchSessions();
     } catch { alert('Failed to delete on backend.'); }
   };
@@ -301,7 +304,7 @@ function SessionsView() {
                 <td className="p-6 font-mono text-zinc-400">{s.num_images || '?'}</td>
                 <td className="p-6 font-mono text-zinc-400">{JSON.stringify(s.thresholds || {})}</td>
                 <td className="p-6 text-right space-x-4">
-                  <a href={`${API_URL}/sessions/${s.session_id}/export`} target="_blank" className="font-semibold text-emerald-400 hover:text-emerald-300 uppercase text-sm tracking-wider">Export Zip</a>
+                  <a href={\`\${API_URL}/sessions/\${s.session_id}/export\`} target="_blank" className="font-semibold text-emerald-400 hover:text-emerald-300 uppercase text-sm tracking-wider">Export Zip</a>
                   <button onClick={() => deleteSession(s.session_id)} className="font-semibold text-red-500 hover:text-red-400 uppercase text-sm tracking-wider">Delete</button>
                 </td>
               </tr>
@@ -319,7 +322,7 @@ function AnalyticsView() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await axios.get(`${API_URL}/analytics/summary`);
+        const res = await axios.get(\`\${API_URL}/analytics/summary\`);
         setStats(res.data);
       } catch {
         setStats({ total_inspections: 12408, failure_rate: 4.2 });
@@ -348,3 +351,5 @@ function AnalyticsView() {
     </div>
   );
 }
+`;
+fs.writeFileSync('C:/Users/Utkarsh Kumar/ParakhAI/frontend/src/components/AppDashboard.tsx', fileContent);

@@ -1,0 +1,24 @@
+# ParakhAI Edge Deployment Configuration
+system:
+  device: "cpu" # Default to cpu on edge unless mps/gpu available
+  log_level: "INFO"
+  seed: 42
+
+model:
+  type: "patchcore"
+  backbone: "wideresnet50" # Could switch to dinov2 for higher representation but slower
+  coreset_ratio: 0.01
+
+inference:
+  streaming:
+    display_fps: 15
+    inference_fps: 5
+    motion_threshold: 0.02
+  heatmap:
+    warn_threshold: 0.5
+    fail_threshold: 0.75
+    alpha: 0.4
+
+storage:
+  model_dir: "data/models"
+  db_path: "data/parakh.db"

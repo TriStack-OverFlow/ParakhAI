@@ -1,0 +1,7 @@
+README.md
+pyproject.toml
+parakh_ai.egg-info/PKG-INFO
+parakh_ai.egg-info/SOURCES.txt
+parakh_ai.egg-info/dependency_links.txt
+parakh_ai.egg-info/requires.txt
+parakh_ai.egg-info/top_level.txt

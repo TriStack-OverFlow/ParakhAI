@@ -1,0 +1,27 @@
+# Environments
+venv/
+env/
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Datasets and Outputs
+data/mvtec/
+data/visa/
+data/custom/
+data/models/
+data/flagged_frames/
+data/parakh.db
+data/**/*.faiss
+data/**/*.pkl
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Notebooks
+.ipynb_checkpoints/

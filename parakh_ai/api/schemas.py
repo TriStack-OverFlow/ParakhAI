@@ -1,0 +1,49 @@
+from pydantic import BaseModel
+from typing import List, Optional, Literal
+from datetime import datetime
+
+class BBoxResponse(BaseModel):
+    x: int
+    y: int
+    w: int
+    h: int
+    score: float
+    area_px: int
+
+class InferenceResponseModel(BaseModel):
+    session_id: str
+    timestamp: datetime
+    anomaly_score: float
+    is_defective: bool
+    severity: str
+    heatmap_b64: Optional[str] = None
+    defect_bboxes: List[BBoxResponse] = []
+    inference_time_ms: float
+    model_version: str
+
+class CalibrationResponseModel(BaseModel):
+    session_id: str
+    calibration_time_s: float
+    n_images_used: int
+    coreset_size: int
+    threshold: float
+
+class SessionMetadataResponse(BaseModel):
+    session_id: str
+    session_name: str
+    product_description: str
+    model_type: str
+    backbone: str
+    coreset_ratio: float
+    n_calibration_images: int
+    calibration_time_s: float
+    threshold: float
+    score_p50: float
+    score_p99: float
+    created_at: str
+    updated_at: str
+
+class DefectStatsResponse(BaseModel):
+    defect_rate: float
+    window_minutes: int
+    total_inspected: int

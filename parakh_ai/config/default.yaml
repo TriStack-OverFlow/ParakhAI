@@ -1,0 +1,40 @@
+model:
+  type: "patchcore"
+  backbone: "wideresnet50"
+  coreset_ratio: 0.01
+  layers: [2, 3]
+  neighborhood_size: 3
+
+inference:
+  image_size: 224
+  batch_size: 8
+  threshold_percentile: 99.0
+
+heatmap:
+  alpha: 0.4
+  blur_sigma: 4.0
+  colormap: "JET"
+  severity_warn_threshold: 0.5
+  severity_fail_threshold: 0.75
+  min_contour_area: 50
+
+streaming:
+  camera_index: 0
+  display_fps: 15
+  inference_fps: 5
+  motion_threshold: 0.02
+
+storage:
+  model_dir: "data/models/"
+  flagged_frames_dir: "data/flagged_frames/"
+  db_path: "data/parakh.db"
+  auto_save_threshold: 0.7
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  max_upload_size_mb: 10
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s | ParakhAI | %(name)s | %(levelname)s | %(message)s"

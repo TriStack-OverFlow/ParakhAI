@@ -58,7 +58,7 @@ const HeroSequence: React.FC = () => {
         end: 'bottom bottom',
         scrub: 0.5
       },
-      onUpdate: () => requestAnimationFrame(render)
+      onUpdate: () => { requestAnimationFrame(render); }
     });
 
     return () => {

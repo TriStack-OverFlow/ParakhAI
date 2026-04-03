@@ -3,10 +3,26 @@ import { Mail, Lock, ArrowRight } from 'lucide-react';
 import ThreeBackground from './ThreeBackground';
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
+import { useGoogleLogin } from '@react-oauth/google';
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
+  const navigate = useNavigate();
   const formRef = useRef<HTMLFormElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
+
+  const handleGoogleSuccess = async (tokenResponse: any) => {
+    try {
+      const res = await fetch(import.meta.env.VITE_API_URL + '/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: tokenResponse.credential || tokenResponse.access_token })
+      });
+      if(res.ok) navigate('/dashboard');
+    } catch (e) { console.error('OAuth fall', e); }
+  };
+
+  const login = useGoogleLogin({ onSuccess: handleGoogleSuccess });
 
   useEffect(() => {
     if (formRef.current && titleRef.current) {
@@ -28,8 +44,7 @@ export default function Login() {
         <h2 ref={titleRef} className="text-4xl font-semibold mb-8 text-center tracking-tight">Access Platform</h2>
         
         <form ref={formRef} className="flex flex-col gap-6" onSubmit={(e) => { e.preventDefault(); }}>
-          <button type="button" className="w-full flex items-center justify-center gap-3 bg-white text-black py-3.5 rounded-xl font-medium hover:bg-zinc-200 transition-colors shadow-lg group">
-             <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            <button type="button" onClick={() => login()} className="w-full flex items-center justify-center gap-3 bg-white text-black py-3.5 rounded-xl font-medium hover:bg-zinc-200 transition-colors shadow-lg group">
              Sign in with Google
           </button>
           

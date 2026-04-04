@@ -55,7 +55,7 @@ function DefaultLayout() {
   return (
     <div className="w-full min-h-screen font-sans antialiased relative z-10 selection:bg-cyan-500/30 bg-black text-white">
       <header className="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-8 py-6 pointer-events-none">
-        <Link to="/" className="text-3xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 pointer-events-auto drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] transition-all hover:scale-105 hover:text-white" style={{ fontFamily: "'samarkan', sans-serif" }}>Parakh.AI</Link>
+        <Link to="/" className="text-3xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 pointer-events-auto drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] transition-all hover:scale-105 hover:text-white" style={{ fontFamily: "'Samarkan', sans-serif" }}>Parakh.AI</Link>
         <div className="flex items-center space-x-6 pointer-events-auto bg-black/40 backdrop-blur-md px-6 py-2 rounded-full border border-white/10">
           
           <button

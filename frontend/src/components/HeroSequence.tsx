@@ -153,7 +153,7 @@ const HeroSequence: React.FC = () => {
         {/* Overlay 1: Intro */}
         <div ref={text1Ref} className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20 opacity-0 px-6">
           <div className="flex flex-col items-center text-center">
-            <h1 className="text-7xl md:text-9xl max-w-5xl font-extrabold tracking-tighter text-white mb-6 shadow-black drop-shadow-2xl mix-blend-plus-lighter">
+            <h1 className="text-7xl md:text-9xl max-w-5xl font-extrabold tracking-tighter text-white mb-6 shadow-black drop-shadow-2xl mix-blend-plus-lighter" style={{ fontFamily: "'Samarkan', sans-serif" }}>
               Parakh.AI
             </h1>
             <p className="text-2xl md:text-4xl text-zinc-300 max-w-3xl font-light leading-relaxed drop-shadow-lg tracking-wide">

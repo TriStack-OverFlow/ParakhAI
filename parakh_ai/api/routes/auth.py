@@ -29,9 +29,10 @@ async def google_auth(request: GoogleTokenRequest):
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 "https://www.googleapis.com/oauth2/v3/userinfo",
-                headers={"Authorization": f"Bearer {request.token}"}
+                headers={"Authorization": f"Bearer {request.token}"},
+                timeout=10.0
             )
-            
+
             if response.status_code != 200:
                 raise ValueError(f"Invalid access token: {response.text}")
             
@@ -43,6 +44,7 @@ async def google_auth(request: GoogleTokenRequest):
         picture = idinfo.get("picture")
 
         try:
+            import httpx
             brevo_url = "https://api.brevo.com/v3/smtp/email"
             headers = {
                 "api-key": BREVO_API_KEY,
@@ -55,11 +57,12 @@ async def google_auth(request: GoogleTokenRequest):
                 "subject": "Welcome to Parakh.AI!",
                 "htmlContent": f"<html><body><h1>Welcome to Parakh.AI, {name}!</h1><p>We are thrilled to have you onboard.</p></body></html>"
             }
-            brevo_response = sync_requests.post(brevo_url, json=data, headers=headers, timeout=5)
-            if brevo_response.status_code not in [200, 201, 202]:
-                logging.getLogger(__name__).warning(f"Brevo failed: {brevo_response.status_code} - {brevo_response.text}")
-            else:
-                logging.getLogger(__name__).info(f"Welcome email successfully sent via Brevo for {email}!")
+            async with httpx.AsyncClient() as client:
+                brevo_response = await client.post(brevo_url, json=data, headers=headers, timeout=5.0)
+                if brevo_response.status_code not in [200, 201, 202]:
+                    logging.getLogger(__name__).warning(f"Brevo failed: {brevo_response.status_code} - {brevo_response.text}")
+                else:
+                    logging.getLogger(__name__).info(f"Welcome email successfully sent via Brevo for {email}!")
         except Exception as mail_error:
             logging.getLogger(__name__).error(f"Email request error: {mail_error}")
 

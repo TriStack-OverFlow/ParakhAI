@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { Camera, Activity, Video, RefreshCw, Layers, BrainCircuit, CheckCircle2 } from 'lucide-react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -150,7 +150,7 @@ export default function ParallaxDashboard() {
       {/* Floating Sidebar Menu */}
       <aside className="fixed left-6 top-1/2 -translate-y-1/2 w-64 bg-black/40 backdrop-blur-2xl border border-white/10 rounded-[2rem] flex flex-col p-4 shadow-[0_0_50px_rgba(0,0,0,0.5)] z-50">
         <div className="mb-6 p-4">
-            <Link to="/" className="text-3xl font-extrabold tracking-tighter text-white flex items-center hover:scale-105 transition-transform" style={{ fontFamily: "'samarkan', sans-serif" }}>
+            <Link to="/" className="text-3xl font-extrabold tracking-tighter text-white flex items-center hover:scale-105 transition-transform" style={{ fontFamily: "'Samarkan', sans-serif" }}>
               <BrainCircuit className="w-8 h-8 mr-3 text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.6)]" />
               Parakh.AI
             </Link>
@@ -299,7 +299,7 @@ function InferenceView() {
       const res = await axios.post(`${API_URL}/infer/accept`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      alert(`✅ Distribution updated.\nCoreset: ${res.data.stats.old_coreset_size} → ${res.data.stats.coreset_size} vectors.\nNew μ=${res.data.stats.new_mean.toFixed(2)}, σ=${res.data.stats.new_std.toFixed(2)}`);
+      alert(`? Distribution updated.\nCoreset: ${res.data.stats.old_coreset_size} ? ${res.data.stats.coreset_size} vectors.\nNew �=${res.data.stats.new_mean.toFixed(2)}, s=${res.data.stats.new_std.toFixed(2)}`);
       setResult({ ...result, severity: 'PASS', is_defective: false, defect_bboxes: [] });
     } catch (err: any) {
       alert(err.response?.data?.detail || 'Failed to accept as normal.');
@@ -316,7 +316,7 @@ function InferenceView() {
     formData.append('session_name', sessionId);
     try {
        await axios.post(`${API_URL}/calibrate`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-       alert('⚡ Express Calibration Complete! Model Hot-Swapped.');
+       alert('? Express Calibration Complete! Model Hot-Swapped.');
        setResult(null);
        setTestImages([]);
        setPreview(null);
@@ -441,8 +441,8 @@ function InferenceView() {
           <div className="w-full bg-amber-500/20 border border-amber-500/50 rounded-2xl p-6 mb-8 flex flex-col items-start gap-4 animate-pulse relative overflow-hidden backdrop-blur-xl">
              <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 to-transparent pointer-events-none" />
              <div className="relative z-10 flex w-full justify-between items-center">
-               <h3 className="text-amber-400 font-semibold text-xl tracking-tight">⚠️ Domain Shift Detected</h3>
-               <span className="text-amber-500/70 text-sm italic font-mono">μ={(result.drift_window_mean || 0).toFixed(2)} σ={(result.drift_window_std || 0).toFixed(2)}</span>
+               <h3 className="text-amber-400 font-semibold text-xl tracking-tight">?? Domain Shift Detected</h3>
+               <span className="text-amber-500/70 text-sm italic font-mono">�={(result.drift_window_mean || 0).toFixed(2)} s={(result.drift_window_std || 0).toFixed(2)}</span>
              </div>
              <p className="text-amber-200/80 relative z-10">Product line appears to have changed. The last 5+ images all scored highly with low variance.</p>
 
@@ -452,7 +452,7 @@ function InferenceView() {
                    <input type="file" multiple accept="image/*" onChange={(e) => setExpressFiles(Array.from(e.target.files || []))} className="hidden" />
                 </label>
                 <button disabled={isExpressCalib || expressFiles.length < 1} onClick={handleExpressCalibrate} className="w-full lg:w-auto px-6 py-4 bg-amber-500 hover:bg-amber-400 text-black font-semibold rounded-xl transition-colors disabled:opacity-50">
-                   {isExpressCalib ? 'Calibrating...' : '⚡ Express Re-Calibrate'}
+                   {isExpressCalib ? 'Calibrating...' : '? Express Re-Calibrate'}
                 </button>
              </div>
           </div>
@@ -546,7 +546,7 @@ function InferenceView() {
                 </div>
                 {(result.severity === 'FAIL' || result.severity === 'WARN' || result.is_defective) && result.drift_status !== 'domain_shift' && (
                   <button disabled={isAccepting} onClick={handleAcceptAsNormal} className="mt-8 px-4 py-3 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(52,211,153,0.3)] transition-colors text-[10px] w-full whitespace-nowrap overflow-hidden">
-                    {isAccepting ? 'Updating Vector Space...' : '✅ Accept as Normal'}
+                    {isAccepting ? 'Updating Vector Space...' : '? Accept as Normal'}
                   </button>
                 )}              </div>
             )}

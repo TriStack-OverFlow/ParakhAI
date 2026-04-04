@@ -65,7 +65,7 @@ function DefaultLayout() {
             {i18n.language === 'en' ? 'HI' : 'EN'}
           </button>
 
-          <Link to="/pricing" className="text-sm font-medium text-amber-300 hover:text-amber-200 transition">Plans</Link>
+          <Link to="/pricing" className="text-sm font-medium text-amber-300 hover:text-amber-200 transition">{t('nav.plans') || 'Plans'}</Link>
           <Link to="/dashboard" className="text-sm font-medium hover:text-zinc-300 transition">{t('nav.dashboard')}</Link>
           <Link to="/docs" className="text-sm font-medium hover:text-zinc-300 transition">{t('nav.docs')}</Link>
           <div className="flex items-center space-x-2 pl-4 border-l border-white/20">

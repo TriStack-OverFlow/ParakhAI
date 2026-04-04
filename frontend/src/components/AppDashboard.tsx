@@ -11,6 +11,7 @@ gsap.registerPlugin(ScrollTrigger);
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
 export default function ParallaxDashboard() {
+  const { t } = useTranslation();
   const [user] = useState<{name?: string, picture?: string, email?: string}>(() => { try { return JSON.parse(localStorage.getItem('user') || '{}'); } catch (e) { return {}; } });
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -152,14 +153,14 @@ export default function ParallaxDashboard() {
             <BrainCircuit className="w-6 h-6 mr-3 text-cyan-400" />
             Parakh.AI
           </h2>
-          <p className="text-[10px] text-zinc-400 mt-2 font-mono uppercase tracking-widest">{user?.name || 'Administrator'} • Edge Node</p>
+          <p className="text-[10px] text-zinc-400 mt-2 font-mono uppercase tracking-widest">{user?.name || 'Administrator'} &bull; Edge Node</p>
         </div>
 
         <div className="flex flex-col gap-2">
-            <SidebarLink icon={<RefreshCw size={18} />} title="1. Model Calibration" active={activeTab === 'calibration'} onClick={() => scrollToSection(calibRef, 'calibration')} />
-            <SidebarLink icon={<Camera size={18} />} title="2. Live Inspection" active={activeTab === 'inference'} onClick={() => scrollToSection(inferRef, 'inference')} />       
-            <SidebarLink icon={<Layers size={18} />} title="3. Model Registry" active={activeTab === 'sessions'} onClick={() => scrollToSection(registryRef, 'sessions')} />
-            <SidebarLink icon={<Activity size={18} />} title="4. Analytics" active={activeTab === 'analytics'} onClick={() => scrollToSection(analyticsRef, 'analytics')} />
+            <SidebarLink icon={<RefreshCw size={18} />} title={t('dashboard.step1')} active={activeTab === 'calibration'} onClick={() => scrollToSection(calibRef, 'calibration')} />
+            <SidebarLink icon={<Camera size={18} />} title={t('dashboard.step2')} active={activeTab === 'inference'} onClick={() => scrollToSection(inferRef, 'inference')} />
+            <SidebarLink icon={<Layers size={18} />} title={t('dashboard.step3')} active={activeTab === 'sessions'} onClick={() => scrollToSection(registryRef, 'sessions')} />
+            <SidebarLink icon={<Activity size={18} />} title={t('dashboard.step4')} active={activeTab === 'analytics'} onClick={() => scrollToSection(analyticsRef, 'analytics')} />
         </div>
       </aside>
 

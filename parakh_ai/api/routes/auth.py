@@ -10,9 +10,9 @@ from parakh_ai.api.telegram_bot import generate_link_token
 
 router = APIRouter()
 
-CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
-MAILBLUSTER_API_KEY = os.getenv("MAILBLUSTER_API_KEY", "")
-SENDER_EMAIL = os.getenv("SENDER_EMAIL", "")
+CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "1096135752260-t9805k4oj76q2sre5qn7f62nkerokitg.apps.googleusercontent.com")
+MAILBLUSTER_API_KEY = os.getenv("MAILBLUSTER_API_KEY", "83f4115e-c76c-4445-9b38-c618fd46a820")
+SENDER_EMAIL = os.getenv("SENDER_EMAIL", "utkarsh10a42.hts21@gmail.com")
 
 class GoogleAuthRequest(BaseModel):
     token: str
@@ -20,7 +20,7 @@ class GoogleAuthRequest(BaseModel):
 @router.get("/telegram-token")
 def get_telegram_token(email: str):
     token = generate_link_token(email)
-    return {"token": token, "bot_url": f"https://t.me/parakhbot?start={token}"}
+    return {"token": token, "bot_url": f"https://t.me/parakhbot?start={token}"} 
 
 @router.post("/google")
 def google_auth(req: GoogleAuthRequest):
@@ -37,26 +37,22 @@ def google_auth(req: GoogleAuthRequest):
         picture = user_info.get("picture", "")
 
         try:
-            # TODO: REPLACE WITH YOUR BREVO API KEY
-            api_key = os.getenv("BREVO_API_KEY", "")
-            if not api_key:
-                print("Warning: BREVO_API_KEY is not set.")
-            mb_url = "https://api.brevo.com/v3/smtp/email"
+            mb_url = "https://api.mailbluster.com/api/leads"
             headers = {
-                "api-key": api_key,
+                "Authorization": MAILBLUSTER_API_KEY,
                 "Content-Type": "application/json"
             }
             data = {
-                "sender": {"name": "Parakh.AI", "email": SENDER_EMAIL},
-                "to": [{"email": email, "name": name}],
-                "subject": "Welcome to Parakh.AI! 🚀 Let's get started",
-                "htmlContent": f"<html><body><h3>Hi {name},</h3><p>Welcome to <strong>Parakh.AI</strong>! We are thrilled to have you on board.</p><p>Head over to your <a href='http://localhost:5173/dashboard'>Dashboard</a> to start setting up your first workspace.</p><br><p>Best regards,<br>The Parakh.AI Team</p></body></html>"
+                "email": email,
+                "firstName": name,
+                "subscribed": True,
+                "tags": ["ParakhAI_User", "Welcome_Email_Trigger"]
             }
             mb_response = requests.post(mb_url, json=data, headers=headers, timeout=5)
             if mb_response.status_code not in [200, 201]:
-                print(f"Brevo failed: {mb_response.status_code} - {mb_response.text}")
+                print(f"Mailbluster failed: {mb_response.status_code} - {mb_response.text}")
             else:
-                print(f"Welcome email successfully sent to {email} via Brevo!")
+                print(f"Welcome email successfully triggered via Mailbluster for {email}!") 
         except Exception as mb_error:
             print(f"Email request error: {mb_error}")
 

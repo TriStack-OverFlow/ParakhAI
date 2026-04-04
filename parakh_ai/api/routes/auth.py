@@ -1,71 +1,64 @@
-﻿from fastapi import APIRouter, HTTPException, Depends
-from pydantic import BaseModel
-import requests
-import os
-import logging
+from fastapi import APIRouter, HTTPException, Depends
+from google.oauth2 import id_token
+from google.auth.transport import requests
+import jwt
+import datetime
 
-logger = logging.getLogger(__name__)
-
-from parakh_ai.api.telegram_bot import generate_link_token
+from parakh_ai.api.schemas import GoogleTokenRequest, AuthResponseModel, UserResponse
 
 router = APIRouter()
 
-CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "1096135752260-t9805k4oj76q2sre5qn7f62nkerokitg.apps.googleusercontent.com")
-MAILBLUSTER_API_KEY = os.getenv("MAILBLUSTER_API_KEY", "83f4115e-c76c-4445-9b38-c618fd46a820")
-SENDER_EMAIL = os.getenv("SENDER_EMAIL", "utkarsh10a42.hts21@gmail.com")
+# The client ID is usually checked against the frontend's client ID,
+# but for a dev prototype/hackathon we can skip strict audience verification
+# by not passing the specific audience, or by using a secret key.
+JWT_SECRET = "super-secret-parakhai-hackathon-key"
 
-class GoogleAuthRequest(BaseModel):
-    token: str
-
-@router.get("/telegram-token")
-def get_telegram_token(email: str):
-    token = generate_link_token(email)
-    return {"token": token, "bot_url": f"https://t.me/parakhbot?start={token}"} 
-
-@router.post("/google")
-def google_auth(req: GoogleAuthRequest):
+@router.post("/google", response_model=AuthResponseModel)
+async def google_auth(request: GoogleTokenRequest):
     try:
-        user_info_url = "https://www.googleapis.com/oauth2/v3/userinfo"
-        res = requests.get(user_info_url, headers={"Authorization": f"Bearer {req.token}"})
+        import httpx
+        # The frontend's useGoogleLogin hook returns an access token via implicit flow.
+        # We need to fetch the user info using the access token from Google's userinfo API.
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                "https://www.googleapis.com/oauth2/v3/userinfo",
+                headers={"Authorization": f"Bearer {request.token}"}
+            )
+            
+            if response.status_code != 200:
+                raise ValueError(f"Invalid access token: {response.text}")
+            
+            idinfo = response.json()
 
-        if res.status_code != 200:
-            raise ValueError(f"Invalid access token. Google returned: {res.text}")
+        user_id = idinfo["sub"]
+        email = idinfo.get("email")
+        name = idinfo.get("name")
+        picture = idinfo.get("picture")
 
-        user_info = res.json()
-        email = user_info["email"]
-        name = user_info.get("name", "")
-        picture = user_info.get("picture", "")
-
-        try:
-            mb_url = "https://api.mailbluster.com/api/leads"
-            headers = {
-                "Authorization": MAILBLUSTER_API_KEY,
-                "Content-Type": "application/json"
-            }
-            data = {
-                "email": email,
-                "firstName": name,
-                "subscribed": True,
-                "tags": ["ParakhAI_User", "Welcome_Email_Trigger"]
-            }
-            mb_response = requests.post(mb_url, json=data, headers=headers, timeout=5)
-            if mb_response.status_code not in [200, 201]:
-                print(f"Mailbluster failed: {mb_response.status_code} - {mb_response.text}")
-            else:
-                print(f"Welcome email successfully triggered via Mailbluster for {email}!") 
-        except Exception as mb_error:
-            print(f"Email request error: {mb_error}")
-
-        return {
-            "status": "success",
-            "token": req.token,
-            "user": {
-                "email": email,
-                "name": name,
-                "picture": picture
-            }
+        # Create our own JWT Session Token
+        expiration = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+        payload = {
+            "sub": user_id,
+            "email": email,
+            "name": name,
+            "role": "operator",
+            "exp": expiration
         }
-    except ValueError as ve:
-        raise HTTPException(status_code=401, detail=f"Invalid token: {str(ve)}")
+        
+        encoded_jwt = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+
+        return AuthResponseModel(
+            token=encoded_jwt,
+            user=UserResponse(
+                id=user_id,
+                email=email,
+                name=name,
+                picture=picture,
+                role="operator"
+            )
+        )
+    except ValueError as e:
+        # Invalid token
+        raise HTTPException(status_code=401, detail=f"Invalid Google token: {str(e)}")
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))

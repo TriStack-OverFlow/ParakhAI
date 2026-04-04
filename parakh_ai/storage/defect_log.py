@@ -54,6 +54,28 @@ class DefectLog:
                 json.dumps([b.__dict__ for b in getattr(result, 'defect_bboxes', [])])
             ))
             
+    
+    def get_global_stats(self) -> dict:
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT COUNT(*) as total, SUM(is_defective) as defects FROM inspections')
+            row = cursor.fetchone()
+            total = row[0] if (row and row[0]) else 0
+            defects = row[1] if (row and row[1]) else 0
+            fail_rate = (float(defects) / float(total) * 100.0) if total > 0 else 0.0
+            return {"total_inspections": total, "failure_rate": fail_rate}
+
+    
+    def get_global_stats(self) -> dict:
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT COUNT(*) as total, SUM(is_defective) as defects FROM inspections')
+            row = cursor.fetchone()
+            total = row[0] if (row and row[0]) else 0
+            defects = row[1] if (row and row[1]) else 0
+            fail_rate = (float(defects) / float(total) * 100.0) if total > 0 else 0.0
+            return {"total_inspections": total, "failure_rate": fail_rate}
+
     def get_defect_rate(self, session_id: str, window_minutes: int = 60) -> float:
         cutoff = (datetime.utcnow() - timedelta(minutes=window_minutes)).isoformat()
         with sqlite3.connect(self.db_path) as conn:

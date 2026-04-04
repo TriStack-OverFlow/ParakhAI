@@ -373,7 +373,7 @@ function InferenceView() {
             headers: { 'Content-Type': 'multipart/form-data' }
           });
           finalResult = res.data;
-          setResult(res.data);
+          setResult(res.data); window.dispatchEvent(new CustomEvent('inference_complete', { detail: res.data })); window.dispatchEvent(new CustomEvent('inference_complete', { detail: res.data }));
         } else {
           testImages.forEach(img => formData.append('files', img));
           const res = await axios.post(`${API_URL}/infer/batch`, formData, {    

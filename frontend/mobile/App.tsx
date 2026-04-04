@@ -6,6 +6,7 @@ import { StyleSheet, Text, View, TouchableOpacity, TextInput, ActivityIndicator,
 import { useState, useEffect } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Picker } from '@react-native-picker/picker';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -76,9 +77,10 @@ function ScannerTab() {
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [selectedModel, setSelectedModel] = useState<string>('resnet50'); // Added Model Selection
 
   const pickImage = async () => {
-    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();       
     if (!perm.granted) return Alert.alert('Permission required', 'We need access to your gallery!');
 
     const res = await ImagePicker.launchImageLibraryAsync({
@@ -115,7 +117,7 @@ function ScannerTab() {
         type: 'image/jpeg',
         name: 'upload.jpg',
       } as any);
-      formData.append('session_id', 'demo_model');
+      formData.append('session_id', selectedModel); // Used the selected model here
       formData.append('generate_heatmap', 'true');
 
       const response = await fetch(`${GLOBAL_API_URL}/api/v1/infer`, {
@@ -124,98 +126,81 @@ function ScannerTab() {
         body: formData,
       });
 
-      if (!response.ok) throw new Error(`Failed with status ${response.status}`);
+      if (!response.ok) throw new Error('Diagnostics failed. Ensure Edge API is reachable.');
       const data = await response.json();
       setResult(data);
-    } catch (error: any) {
-      Alert.alert('Inference Failed', error.message || 'Check your Edge API URL and ensure the server is running.');
+    } catch (e: any) {
+      Alert.alert('Diagnostics Error', e.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const acceptAsNormal = async () => {
-    if (!imageUri) return;
-    setLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', {
-        uri: imageUri,
-        type: 'image/jpeg',
-        name: 'upload.jpg',
-      } as any);
-      formData.append('session_id', 'demo_model');
-
-      const response = await fetch(`${GLOBAL_API_URL}/api/v1/infer/accept`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'multipart/form-data' },
-        body: formData,
-      });
-
-      if (!response.ok) throw new Error(`Failed with status ${response.status}`);
-      Alert.alert('Success', 'Model updated with new normal image.');
-      setResult(null);
-      setImageUri(null);
-    } catch (error: any) {
-      Alert.alert('Update Failed', error.message);
-    } finally {
-      setLoading(false);
-    }
+  const resetScanner = () => {
+    setImageUri(null);
+    setResult(null);
   };
 
   return (
     <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.scrollContent}>
-      <Text style={styles.titleSmall}>Visual Anomaly Scanner</Text>
-      <Text style={styles.subtitle}>Stream images to your Edge Node for instant defect detection and heatmap generation.</Text>
-
-      <View style={{flexDirection: 'row', gap: 10, width: '100%', marginBottom: 20}}>
-        <TouchableOpacity style={[styles.buttonMain, {flex: 1, backgroundColor: 'rgba(255,255,255,0.1)'}]} onPress={takePhoto}>
-          <MaterialCommunityIcons name="camera" size={24} color="#fff" />
-          <Text style={{color: '#fff', fontWeight: 'bold', marginTop: 5}}>Capture</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.buttonMain, {flex: 1, backgroundColor: 'rgba(255,255,255,0.1)'}]} onPress={pickImage}>
-          <MaterialCommunityIcons name="image-multiple" size={24} color="#fff" />
-          <Text style={{color: '#fff', fontWeight: 'bold', marginTop: 5}}>Upload</Text>
-        </TouchableOpacity>
-      </View>
-
-      {imageUri && !result && (
-        <View style={styles.card}>
-          <Text style={styles.statLabel}>TARGET ACQUIRED</Text>
-          <Image source={{uri: imageUri}} style={{width: '100%', height: 200, borderRadius: 12, marginBottom: 20}} resizeMode="cover" />
-          <TouchableOpacity style={styles.buttonMain} onPress={runDiagnostics} disabled={loading}>
-            {loading ? <ActivityIndicator color="#000" /> : <Text style={styles.buttonTextLight}>Run Diagnostics</Text>}
-          </TouchableOpacity>
+      <Text style={styles.titleSmall}>Edge Scanner</Text>
+      <Text style={styles.subtitle}>Run latency-free visual inspection nodes.</Text>
+      
+      <View style={styles.card}>
+        <Text style={styles.label}>Select AI Model</Text>
+        <View style={{ backgroundColor: 'rgba(0,0,0,0.5)', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1, borderRadius: 12, marginBottom: 20 }}>
+          <Picker
+            selectedValue={selectedModel}
+            onValueChange={(itemValue) => setSelectedModel(itemValue)}
+            style={{ color: '#fff' }}
+            dropdownIconColor="#06b6d4"
+          >
+            <Picker.Item label="ResNet-50 Node" value="resnet50" />
+            <Picker.Item label="Vision Transformer (ViT)" value="vit" />
+            <Picker.Item label="EfficientNet B0" value="efficientnet" />
+          </Picker>
         </View>
-      )}
 
-      {result && (
-        <View style={[styles.card, {marginTop: 10, borderColor: result.is_defective ? '#ef4444' : '#22c55e'}]}>
-          <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 10}}>
-             <MaterialCommunityIcons name={result.is_defective ? "close-circle-outline" : "check-circle-outline"} size={32} color={result.is_defective ? '#ef4444' : '#22c55e'} />
-             <Text style={[styles.cardTitle, {marginLeft: 10, marginBottom: 0}]}>{result.is_defective ? 'DEFECT DETECTED ❌' : 'NORMAL ✅'}</Text>
+        {!imageUri ? (
+          <View>
+            <View style={{flexDirection: 'row', gap: 10, width: '100%'}}>
+                <TouchableOpacity style={[styles.buttonOutline, {flex: 1, borderColor:'#06b6d4'}]} onPress={takePhoto}>
+                    <Text style={{color:'#06b6d4', textAlign:'center', fontWeight:'bold'}}>Camera</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.buttonOutline, {flex: 1, borderColor:'#06b6d4'}]} onPress={pickImage}>
+                    <Text style={{color:'#06b6d4', textAlign:'center', fontWeight:'bold'}}>Gallery</Text>
+                </TouchableOpacity>
+            </View>
           </View>
-          <Text style={styles.subtitle}>Anomaly Score: {(result.anomaly_score * 100).toFixed(2)}% | Model V: {result.model_version || '1.0.0'}</Text>
-          
-          {result.heatmap_b64 && (
-            <>
-              <Text style={styles.statLabel}>DIAGNOSTIC HEATMAP</Text>
-              <Image 
-                source={{uri: `data:image/jpeg;base64,${result.heatmap_b64}`}} 
-                style={{width: '100%', height: 250, borderRadius: 12, marginBottom: 20}} 
-              />
-            </>
-          )}
+        ) : (
+          <View>
+            <Image source={{ uri: imageUri }} style={{ width: '100%', height: 250, borderRadius: 16, marginBottom: 20 }} />
+            
+            {result ? (
+              <View style={{ backgroundColor: result.is_defective ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)', padding: 20, borderRadius: 16, borderColor: result.is_defective ? 'rgba(239,68,68,0.5)' : 'rgba(34,197,94,0.5)', borderWidth: 1, marginBottom: 20 }}>
+                <Text style={{ color: result.is_defective ? '#ef4444' : '#22c55e', fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginBottom: 10 }}>
+                  {result.is_defective ? 'DEFECT DETECTED' : 'CLEAR - NO DEFECT'}
+                </Text>
+                <Text style={{ color: '#fff', textAlign: 'center' }}>Z-Score / Anomaly: {result.anomaly_score?.toFixed(4)}</Text>
+                {result.heatmap_b64 && (
+                   <View style={{ marginTop: 15 }}>
+                     <Text style={{ color: '#a1a1aa', textAlign: 'center', marginBottom: 5, fontSize: 10 }}>ACTIVATION HEATMAP</Text>
+                     <Image source={{ uri: 'data:image/jpeg;base64,' + result.heatmap_b64 }} style={{ width: '100%', height: 150, borderRadius: 8, opacity: 0.8 }} />
+                   </View>
+                )}
+              </View>
+            ) : (
+              <TouchableOpacity style={styles.buttonMain} onPress={runDiagnostics} disabled={loading}>
+                {loading ? <ActivityIndicator color="#000" /> : <Text style={styles.buttonTextLight}>Run AI Inspection</Text>}
+              </TouchableOpacity>
+            )}
 
-          <TouchableOpacity style={[styles.buttonMain, {backgroundColor: '#22c55e', marginBottom: 10}]} onPress={acceptAsNormal} disabled={loading}>
-            {loading ? <ActivityIndicator color="#000" /> : <Text style={styles.buttonTextLight}>Accept as Normal (Retrain)</Text>}
-          </TouchableOpacity>
-
-          <TouchableOpacity style={[styles.buttonOutline, {width: '100%', alignItems: 'center', borderColor: 'rgba(255,255,255,0.2)'}]} onPress={() => {setResult(null); setImageUri(null);}}>
-            <Text style={{color: '#fff', fontWeight: 'bold'}}>Clear Result</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+            <TouchableOpacity style={{ marginTop: 20, alignItems: 'center' }} onPress={resetScanner}>
+              <Text style={{ color: '#a1a1aa' }}>Scan Another Item</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
     </ScrollView>
   );
 }

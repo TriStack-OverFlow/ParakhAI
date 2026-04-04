@@ -22,3 +22,19 @@ def get_recent_defects(session_id: str, limit: int = 20):
 def export_csv(session_id: str):
     # Would return FileResponse of CSV
     return {"status": "not implemented in simple api mock"}
+
+@router.get("")
+def get_global_stats():
+    return log.get_global_stats()
+
+@router.get("/")
+def get_global_stats_slash():
+    return log.get_global_stats()
+
+@router.get("")
+def get_global_stats():
+    return log.get_global_stats()
+
+@router.get("/")
+def get_global_stats_slash():
+    return log.get_global_stats()

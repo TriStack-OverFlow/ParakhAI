@@ -18,7 +18,9 @@ def _get_client():
     global _genai_client
     if _genai_client is None:
         from google import genai
-        api_key = os.environ.get("GEMINI_API_KEY", "AIzaSyAAX5iVJW07YPQvYLwtTXsazPk08itEvPk")
+        api_key = os.environ.get("GEMINI_API_KEY")
+        if not api_key:
+            logger.warning("GEMINI_API_KEY environment variable is not set. AI Analyst will fail or use fallback.")
         _genai_client = genai.Client(api_key=api_key)
     return _genai_client
 

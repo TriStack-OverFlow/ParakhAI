@@ -2,14 +2,17 @@
 from pydantic import BaseModel
 import requests
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 from parakh_ai.api.telegram_bot import generate_link_token
 
 router = APIRouter()
 
-CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "1096135752260-t9805k4oj76q2sre5qn7f62nkerokitg.apps.googleusercontent.com")
-MAILBLUSTER_API_KEY = os.getenv("MAILBLUSTER_API_KEY", "83f4115e-c76c-4445-9b38-c618fd46a820")
-SENDER_EMAIL = os.getenv("SENDER_EMAIL", "utkarsh10a42.hts21@gmail.com")
+CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
+MAILBLUSTER_API_KEY = os.getenv("MAILBLUSTER_API_KEY", "")
+SENDER_EMAIL = os.getenv("SENDER_EMAIL", "")
 
 class GoogleAuthRequest(BaseModel):
     token: str

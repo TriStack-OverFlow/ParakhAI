@@ -4,8 +4,8 @@ import logging
 import os
 import uuid
 
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_API_KEY", "8767196265:AAHVcvN3yImDjY2PZIIosR_LQ-UhGpSyokY")
-BASE_URL = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}"
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_API_KEY", "")
+BASE_URL = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}" if TELEGRAM_TOKEN else ""
 
 logger = logging.getLogger("telegram_bot")
 
@@ -19,6 +19,10 @@ def generate_link_token(email: str) -> str:
     return token
 
 async def start_telegram_polling():
+    if not TELEGRAM_TOKEN:
+        logger.warning("TELEGRAM_API_KEY not set. Bot polling disabled.")
+        return
+
     last_update_id = None
     logger.info("Starting Telegram Bot Polling in background...")
     

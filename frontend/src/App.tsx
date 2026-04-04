@@ -7,6 +7,8 @@ import Footer from './components/Footer';
 import Login from './components/Login';
 import Register from './components/Register';
 import ChatbotWidget from './components/ChatbotWidget';
+import Pricing from './components/Pricing';
+import Payment from './components/Payment';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -56,13 +58,14 @@ function DefaultLayout() {
         <Link to="/" className="text-xl font-bold tracking-[0.2em] text-white pointer-events-auto hover:text-zinc-300 transition-colors drop-shadow-md mix-blend-difference">Parakh.AI</Link>
         <div className="flex items-center space-x-6 pointer-events-auto bg-black/40 backdrop-blur-md px-6 py-2 rounded-full border border-white/10">
           
-          <button 
+          <button
             onClick={() => i18n.changeLanguage(i18n.language === 'en' ? 'hi' : 'en')}
             className="text-xs font-bold px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition"
           >
             {i18n.language === 'en' ? 'HI' : 'EN'}
           </button>
 
+          <Link to="/pricing" className="text-sm font-medium text-amber-300 hover:text-amber-200 transition">Plans</Link>
           <Link to="/dashboard" className="text-sm font-medium hover:text-zinc-300 transition">{t('nav.dashboard')}</Link>
           <Link to="/docs" className="text-sm font-medium hover:text-zinc-300 transition">{t('nav.docs')}</Link>
           <div className="flex items-center space-x-2 pl-4 border-l border-white/20">
@@ -150,6 +153,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route element={<DefaultLayout />}>
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/payment" element={<Payment />} />
           <Route path="/dashboard" element={<><AppDashboard /><ChatbotWidget /></>} />
           <Route path="/docs" element={<DocsPage />} />
           <Route path="/status" element={<StatusPage />} />

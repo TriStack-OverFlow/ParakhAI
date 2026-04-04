@@ -10,6 +10,9 @@ model:
   coreset_ratio: 0.01
 
 inference:
+  illum_norm_method: "clahe"    # lightweight CLAHE; no Retinex on edge hardware
+  illum_norm_clip_limit: 2.0
+  illum_norm_tile_grid: [8, 8]
   streaming:
     display_fps: 15
     inference_fps: 5
@@ -22,3 +25,7 @@ inference:
 storage:
   model_dir: "data/models"
   db_path: "data/parakh.db"
+
+calibration:
+  augmentation_enabled: false   # skip augmentation on edge to save calibration time
+  augmentation_multiplier: 1

@@ -52,9 +52,20 @@ def generate_heatmap(
     anomaly_map_smoothed = gaussian_filter(anomaly_map_resized, sigma=blur_sigma)
     
     # 3. Scale to [0, 255]
-    # We clip values above 1.5 times the fail threshold to avoid blowing out the colormap
-    max_val = max(1.5 * fail_threshold, 1e-5)
+    # We scale so the 99th-percentile anomaly patch maps to full red.
+    # This means even a subtly crumpled paper where max Z ≈ 3.7 but most
+    # patches sit around Z ≈ 0.4 will still show a vivid red hotspot
+    # proportional to the actual defect, not capped by a fixed threshold.
+    p99 = float(np.percentile(anomaly_map_smoothed, 99))
+    # Fall back: if the image is nearly all-normal, use the fail_threshold
+    # so we don't divide by zero or over-amplify pure noise.
+    max_val = max(p99, fail_threshold * 0.5, 1e-5)
     normalized_map = np.clip(anomaly_map_smoothed / max_val, 0.0, 1.0)
+    
+    # Mild gamma to slightly lift mid-range anomalies (1.4 instead of 2.0)
+    # so crumple texture at Z ≈ 1.5 is visible as light orange, not dark blue.
+    normalized_map = np.power(normalized_map, 1.4)
+    
     uint_map = (normalized_map * 255).astype(np.uint8)
     
     # 4. Colormap

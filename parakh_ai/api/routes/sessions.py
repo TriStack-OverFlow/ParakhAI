@@ -10,10 +10,14 @@ logger = logging.getLogger(__name__)
 
 store = ModelStore()
 
-@router.get("", response_model=List[SessionMetadataResponse])
+@router.get("", response_model=List[dict])
 def list_sessions():
-    sessions = store.list_sessions()
-    return [s.to_dict() for s in sessions]
+    try:
+        sessions = store.list_sessions()
+        return [s.to_dict() for s in sessions]
+    except Exception as e:
+        import traceback
+        return [{"error": str(e), "trace": traceback.format_exc()}]
 
 @router.get("/{session_id}", response_model=SessionMetadataResponse)
 def get_session(session_id: str):

@@ -4,11 +4,19 @@ model:
   coreset_ratio: 0.01
   layers: [2, 3]
   neighborhood_size: 3
+  multi_subclass: false
+  clip_router_model: "dinov2_vits14"
 
 inference:
   image_size: 224
   batch_size: 8
   threshold_percentile: 99.0
+  illum_norm_method: "clahe"      # options: none, clahe, retinex, clahe+retinex
+  illum_norm_clip_limit: 1.2      # tuned down from 2.0 to prevent false texture on flat paper
+  illum_norm_tile_grid: [8, 8]
+  enforce_roi_alignment: true     # enables DINOv2 self-attention ROI Guard
+  z_score_threshold: 3.0          # statistical sigma threshold for anomaly detection
+  auto_crop: true
 
 heatmap:
   alpha: 0.4
@@ -38,3 +46,8 @@ api:
 logging:
   level: "INFO"
   format: "%(asctime)s | ParakhAI | %(name)s | %(levelname)s | %(message)s"
+
+calibration:
+  augmentation_enabled: true     # synthetic augmentation for coreset diversity
+  augmentation_multiplier: 4     # each image produces N augmented variants for coreset
+  normality_buffer_size: 50      # synthetic geometric variants for z-score μ/σ calibration

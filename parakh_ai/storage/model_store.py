@@ -2,7 +2,7 @@ import json
 import pickle
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Tuple, Any
+from typing import Dict, List, Tuple, Any, Optional
 
 from parakh_ai.core.patchcore import PatchCore
 from parakh_ai.core.padim import PaDiM
@@ -12,6 +12,9 @@ class SessionMetadata:
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             setattr(self, k, v)
+        # Ensure backward compatibility — old saved sessions won't have this field
+        if not hasattr(self, "subclass_labels"):
+            self.subclass_labels: Optional[List[str]] = None
             
     def to_dict(self):
         return self.__dict__

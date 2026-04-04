@@ -1,5 +1,6 @@
 import ReactDOM from 'react-dom/client'
 import { GoogleOAuthProvider } from '@react-oauth/google'
+import './i18n'
 import App from './App'
 import './index.css'
 

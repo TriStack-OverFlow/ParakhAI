@@ -1,44 +1,73 @@
-# Environments
-venv/
-env/
-.env
-.venv/
+# Python
 __pycache__/
-*.pyc
-.pytest_cache/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# Datasets and Outputs
-data/mvtec/
-data/visa/
-data/custom/
-data/models/
-data/flagged_frames/
-data/parakh.db
-data/**/*.faiss
-data/**/*.pkl
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+ENV/
 
-# IDE / OS
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Environment variables
+.env
+.env.local
+
+# IDEs and Editors
 .vscode/
 .idea/
+*.swp
+*.swo
 .DS_Store
-Thumbs.db
 
-# Notebooks
-.ipynb_checkpoints/
-
-# Common Ignores
+# Javascript / Node
 node_modules/
-dist/
-build/
-.npm/
-*.pyc
-*.pyo
-__pycache__/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.eslintcache
+.playwright-mcp/
 
-# Environments
-venv/
-.venv/
-env/
-.env
-.env.*
-!.env.example
+# Logs
+*.log
+error.log
+error_pipeline.log
+
+# ParakhAI Specific
+data/
+storage/
+models/
+storage_*/
+test_images/
+*out.txt
+result_heatmap_*.jpg
+.gemini/
+implementation_plan.md
+task.md
+walkthrough.md
+
+# Explictly Include Baseline Testing Files
+!data/Good_paper.jpg
+!data/Bad_paper.jpg
+!data/paper_train/

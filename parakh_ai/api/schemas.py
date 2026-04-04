@@ -20,6 +20,9 @@ class InferenceResponseModel(BaseModel):
     defect_bboxes: List[BBoxResponse] = []
     inference_time_ms: float
     model_version: str
+    drift_status: Optional[str] = 'normal'
+    drift_window_mean: Optional[float] = 0.0
+    drift_window_std: Optional[float] = 0.0
 
 class CalibrationResponseModel(BaseModel):
     session_id: str
@@ -30,18 +33,20 @@ class CalibrationResponseModel(BaseModel):
 
 class SessionMetadataResponse(BaseModel):
     session_id: str
-    session_name: str
-    product_description: str
+    session_name: Optional[str] = None
+    product_description: Optional[str] = None
     model_type: str
     backbone: str
     coreset_ratio: float
-    n_calibration_images: int
-    calibration_time_s: float
+    n_calibration_images: Optional[int] = None
+    calibration_time_s: Optional[float] = None
     threshold: float
     score_p50: float
     score_p99: float
-    created_at: str
-    updated_at: str
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
+    # New optional field — None for classic single-class sessions
+    subclass_labels: Optional[List[str]] = None
 
 class DefectStatsResponse(BaseModel):
     defect_rate: float

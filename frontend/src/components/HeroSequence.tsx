@@ -8,7 +8,6 @@ gsap.registerPlugin(ScrollTrigger);
 const HeroSequence: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  
   // Flowing Glassmorphic text blocks
   const text1Ref = useRef<HTMLDivElement>(null);
   const text2Ref = useRef<HTMLDivElement>(null);
@@ -135,7 +134,6 @@ const HeroSequence: React.FC = () => {
        { opacity: 1, y: 0, duration: 15, ease: 'power3.out' }, 
        185
     );
-
     return () => {
       tl.kill();
       ScrollTrigger.getAll().forEach(t => t.kill());

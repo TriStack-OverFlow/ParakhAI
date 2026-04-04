@@ -33,7 +33,18 @@ def download_and_extract(category: str, data_dir: str = "data/mvtec"):
             with DownloadProgressBar(unit='B', unit_scale=True, miniters=1, desc=category) as t:
                 urllib.request.urlretrieve(url, filename=tar_path, reporthook=t.update_to)
         except Exception as e:
-            logger.error(f"Failed to download {category}: {e}")
+            if "404" in str(e) or "Not Found" in str(e):
+                logger.error(
+                    f"\n\n[ERROR] The public download mirror for MVTec AD is currently down (HTTP 404).\n"
+                    f"MVTec regularly rotates their public share links due to licensing restrictions.\n\n"
+                    f"ACTION REQUIRED:\n"
+                    f"1. Go to: https://www.mvtec.com/company/research/datasets/mvtec-ad/\n"
+                    f"2. Download the '{category}' dataset manually.\n"
+                    f"3. Place the downloaded .tar.xz file into your '{data_dir}' folder.\n"
+                    f"4. Re-run this script, and it will automatically extract the file for you.\n"
+                )
+            else:
+                logger.error(f"Failed to download {category}: {e}")
             return
             
     logger.info(f"Extracting {tar_path}...")

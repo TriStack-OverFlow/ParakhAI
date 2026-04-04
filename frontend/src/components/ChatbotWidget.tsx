@@ -30,23 +30,44 @@ export default function ChatbotWidget() {
     }
   }, [isOpen]);
 
-  const handleSend = () => {
+const handleSend = async () => {
     if (!input.trim()) return;
     
     const newMsg = input.trim();
     setMessages(prev => [...prev, { role: 'user', content: newMsg }]);
     setInput('');
-    
-    // Simulate slight bot delay for demo
-    setTimeout(() => {
-      let reply = "I'm a pre-configured assistant. We will integrate live API keys soon to answer your query: '" + newMsg + "'";
-      if (newMsg.toLowerCase().includes('calibration')) {
-         reply = "Calibration involves uploading 10-20 reference images of a 'perfect' part to train the feature extractor.";
-      } else if (newMsg.toLowerCase().includes('inference')) {
-         reply = "Inference is the live quality check. It compares incoming scans against the calibrated threshold to find deviations.";
+
+    // API Key loaded from .env
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    if (!apiKey) {
+      setMessages(prev => [...prev, { role: 'bot', content: "Error: Gemini API key not found in environment." }]);
+      return;
+    }
+
+    try {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: newMsg }] }],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 2048
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('API Request failed');
       }
-      setMessages(prev => [...prev, { role: 'bot', content: reply }]);
-    }, 800);
+
+      const data = await response.json();
+      const replyText = data.candidates?.[0]?.content?.parts?.[0]?.text || "I'm not sure how to answer that.";
+      setMessages(prev => [...prev, { role: 'bot', content: replyText }]);
+    } catch (e) {
+      console.error(e);
+      setMessages(prev => [...prev, { role: 'bot', content: "Sorry, I'm having trouble connecting to my cognitive cores right now." }]);
+    }
   };
 
   return (

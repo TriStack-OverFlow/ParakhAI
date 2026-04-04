@@ -7,6 +7,8 @@ import Footer from './components/Footer';
 import Login from './components/Login';
 import Register from './components/Register';
 import ChatbotWidget from './components/ChatbotWidget';
+import Pricing from './components/Pricing';
+import Payment from './components/Payment';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -53,16 +55,17 @@ function DefaultLayout() {
   return (
     <div className="w-full min-h-screen font-sans antialiased relative z-10 selection:bg-cyan-500/30 bg-black text-white">
       <header className="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-8 py-6 pointer-events-none">
-        <Link to="/" className="text-xl font-bold tracking-[0.2em] text-white pointer-events-auto hover:text-zinc-300 transition-colors drop-shadow-md mix-blend-difference">Parakh.AI</Link>
+        <Link to="/" className="text-3xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 pointer-events-auto drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] transition-all hover:scale-105 hover:text-white" style={{ fontFamily: "'Samarkan', sans-serif" }}>Parakh.AI</Link>
         <div className="flex items-center space-x-6 pointer-events-auto bg-black/40 backdrop-blur-md px-6 py-2 rounded-full border border-white/10">
           
-          <button 
+          <button
             onClick={() => i18n.changeLanguage(i18n.language === 'en' ? 'hi' : 'en')}
             className="text-xs font-bold px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition"
           >
             {i18n.language === 'en' ? 'HI' : 'EN'}
           </button>
 
+          <Link to="/pricing" className="text-sm font-medium text-amber-300 hover:text-amber-200 transition">{t('nav.plans') || 'Plans'}</Link>
           <Link to="/dashboard" className="text-sm font-medium hover:text-zinc-300 transition">{t('nav.dashboard')}</Link>
           <Link to="/docs" className="text-sm font-medium hover:text-zinc-300 transition">{t('nav.docs')}</Link>
           <div className="flex items-center space-x-2 pl-4 border-l border-white/20">
@@ -111,12 +114,58 @@ function DefaultLayout() {
 }
 
 function DocsPage() {
+  const [data, setData] = useState<number[]>([]);
+
+  useEffect(() => {
+    // Simulate live data analytics stream
+    const interval = setInterval(() => {
+      setData(prev => {
+        const newData = [...prev, Math.floor(Math.random() * 100)];
+        if (newData.length > 20) newData.shift();
+        return newData;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className="pt-32 px-10 pb-20 max-w-4xl mx-auto min-h-screen">
-      <h1 className="text-6xl font-extrabold mb-8 tracking-tighter">Documentation</h1>
-      <p className="text-zinc-400 text-xl leading-relaxed">
-        Parakh.AI powers next-generation anomaly detection on the edge. Explore our SDKs, calibration tools, and continuous integration pipeline protocols.
+    <div className="pt-32 px-10 pb-20 max-w-6xl mx-auto min-h-screen">
+      <h1 className="text-6xl font-extrabold mb-8 tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white to-zinc-500">
+        Documentation & Analytics
+      </h1>
+      <p className="text-zinc-400 text-xl leading-relaxed mb-12">
+        Parakh.AI powers next-generation anomaly detection on the edge. Explore our SDKs, calibration tools, and continuous integration pipeline protocols alongside real-time cluster telemetry.     
       </p>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-md">
+          <h2 className="text-2xl font-bold mb-4 text-cyan-400">Live Data Stream</h2>
+          <div className="flex items-end h-40 gap-2 border-b border-white/10 pb-2">
+            {data.map((val, i) => (
+              <div 
+                key={i} 
+                className="flex-1 bg-gradient-to-t from-cyan-600 to-cyan-400 rounded-t-sm transition-all duration-300"
+                style={{ height: `${val}%` }}
+              ></div>
+            ))}
+          </div>
+          <div className="mt-4 flex justify-between text-xs text-zinc-500 font-mono">
+            <span>T-20s</span>
+            <span>Live (Edge Node {Math.floor(Math.random() * 10) + 1})</span>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition cursor-pointer">
+            <h3 className="text-xl font-bold mb-2">Integration SDK</h3>
+            <p className="text-zinc-400 text-sm">Download the C++ and Python SDKs for deploying Parakh.AI agents on IoT hardware.</p>
+          </div>
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition cursor-pointer">
+            <h3 className="text-xl font-bold mb-2">REST API Reference</h3>
+            <p className="text-zinc-400 text-sm">Endpoints for managing diagnostic streams, requesting inferences, and managing your organization.</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -150,6 +199,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route element={<DefaultLayout />}>
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/payment" element={<Payment />} />
           <Route path="/dashboard" element={<><AppDashboard /><ChatbotWidget /></>} />
           <Route path="/docs" element={<DocsPage />} />
           <Route path="/status" element={<StatusPage />} />

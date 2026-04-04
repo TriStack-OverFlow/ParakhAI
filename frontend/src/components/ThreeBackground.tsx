@@ -33,38 +33,34 @@ export default function ThreeBackground() {
     const group = new THREE.Group();
     scene.add(group);
 
-    // Creates multiple floating glassmorphic-like shapes
-    const geo1 = new THREE.IcosahedronGeometry(8, 1);
-    const mat1 = new THREE.MeshPhysicalMaterial({
-      color: 0x111111,
-      emissive: 0x00d0ff,
-      emissiveIntensity: 0.1,
-      roughness: 0.1,
-      metalness: 0.9,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.3
-    });
-    const mesh1 = new THREE.Mesh(geo1, mat1);
-    group.add(mesh1);
+// Creates thousands of moving stars
+    const starCount = 3000;
+    const starGeo = new THREE.BufferGeometry();
+    const starPos = new Float32Array(starCount * 3);
+    const starVels = new Float32Array(starCount);
 
-    const geo2 = new THREE.TorusKnotGeometry(12, 1, 150, 20);
-    const mat2 = new THREE.MeshPhysicalMaterial({
-      color: 0x000000,
-      emissive: 0xffffff,
-      emissiveIntensity: 0.05,
-      roughness: 0.2,
-      metalness: 0.8,
-      wireframe: true,
+    for(let i=0; i<starCount; i++) {
+      starPos[i*3] = (Math.random() - 0.5) * 200;
+      starPos[i*3+1] = (Math.random() - 0.5) * 200;
+      starPos[i*3+2] = (Math.random() - 0.5) * 200;
+      starVels[i] = Math.random() * 0.1 + 0.02;
+    }
+    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+    
+    const starMat = new THREE.PointsMaterial({
+      color: 0x88ccff,
+      size: 0.2,
       transparent: true,
-      opacity: 0.1
+      opacity: 0.8,
+      blending: THREE.AdditiveBlending
     });
-    const mesh2 = new THREE.Mesh(geo2, mat2);
-    group.add(mesh2);
+    
+    const stars = new THREE.Points(starGeo, starMat);
+    group.add(stars);
 
     let mouseX = 0;
     let mouseY = 0;
-    
+
     const handleMouseMove = (e: MouseEvent) => {
       mouseX = (e.clientX - window.innerWidth / 2) * 0.0005;
       mouseY = (e.clientY - window.innerHeight / 2) * 0.0005;
@@ -74,12 +70,16 @@ export default function ThreeBackground() {
     let reqId: number;
     const animate = () => {
       reqId = requestAnimationFrame(animate);
-      
-      mesh1.rotation.x += 0.001;
-      mesh1.rotation.y += 0.002;
-      
-      mesh2.rotation.x -= 0.0015;
-      mesh2.rotation.y -= 0.001;
+
+      const positions = starGeo.attributes.position.array as Float32Array;
+      for(let i=0; i<starCount; i++) {
+        // Move stars towards camera
+        positions[i*3+2] += starVels[i];
+        if (positions[i*3+2] > 50) {
+          positions[i*3+2] = -100;
+        }
+      }
+      starGeo.attributes.position.needsUpdate = true;
 
       group.rotation.x += (mouseY - group.rotation.x) * 0.05;
       group.rotation.y += (mouseX - group.rotation.y) * 0.05;
@@ -106,10 +106,8 @@ export default function ThreeBackground() {
          mountRef.current.removeChild(renderer.domElement);
       }
       renderer.dispose();
-      geo1.dispose();
-      geo2.dispose();
-      mat1.dispose();
-      mat2.dispose();
+      starGeo.dispose();
+      starMat.dispose();
     };
   }, []);
 

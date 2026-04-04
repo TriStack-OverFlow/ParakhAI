@@ -16,8 +16,7 @@ export default function Register() {
   const handleGoogleSuccess = async (tokenResponse: any) => {
     try {
       setStatus('Processing...');
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
-      const res = await fetch(API_URL + '/auth/google', {  
+      const res = await fetch(import.meta.env.VITE_API_URL + '/auth/google', {  
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: tokenResponse.credential || tokenResponse.access_token })
@@ -63,9 +62,12 @@ export default function Register() {
   return (
     <div className="min-h-screen w-full bg-black text-white relative overflow-x-hidden flex font-sans">
       <ThreeBackground />
-      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm z-0 pointer-events-none" />
+      <div className="absolute inset-0 bg-transparent z-0 pointer-events-none" />
 
       <div className="relative z-10 hidden lg:flex w-[45%] flex-col justify-center items-start p-20 border-r border-white/5 bg-gradient-to-r from-black/90 to-black/20">
+        <Link to="/" className="absolute top-10 left-20 text-5xl font-extrabold tracking-tighter text-white flex items-center hover:scale-105 transition-transform z-50 drop-shadow-[0_0_15px_rgba(255,255,255,0.6)]" style={{ fontFamily: "'Samarkan', sans-serif" }}>
+          Parakh.AI
+        </Link>
         <div className="mb-4 flex items-center gap-2 px-4 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-400 text-xs font-bold tracking-widest uppercase shadow-[0_0_15px_rgba(34,211,238,0.2)]">
           <Zap className="w-4 h-4" /> Next-Gen AI Vision
         </div>
@@ -158,7 +160,7 @@ export default function Register() {
               <label className="text-[10px] uppercase tracking-widest text-zinc-400 font-bold px-1">Password</label>
               <div className="relative flex items-center group">
                 <Lock className="absolute left-4 w-4 h-4 text-zinc-500 group-focus-within:text-cyan-400 transition-colors" />        
-                <input type="password" placeholder="••••••••" className="w-full bg-black/50 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-cyan-400 transition-all tracking-widest hover:bg-white/5" />
+                <input type="password" placeholder="��������" className="w-full bg-black/50 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-cyan-400 transition-all tracking-widest hover:bg-white/5" />
               </div>
             </div>
 

@@ -16,8 +16,7 @@ export default function Login() {
   const handleGoogleSuccess = async (tokenResponse: any) => {
     try {
       setStatus('Authenticating your access token...');
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
-      const res = await fetch(API_URL + '/auth/google', {  
+      const res = await fetch(import.meta.env.VITE_API_URL + '/auth/google', {  
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: tokenResponse.credential || tokenResponse.access_token })
@@ -53,7 +52,7 @@ export default function Login() {
   return (
     <div className="min-h-screen w-full bg-black text-white relative overflow-x-hidden flex font-sans">
       <ThreeBackground />
-      <div ref={bgRef} className="absolute inset-0 bg-black/40 backdrop-blur-sm z-0 pointer-events-none" />
+      <div ref={bgRef} className="absolute inset-0 bg-black/10 z-0 pointer-events-none" />
 
       {/* Main Login Form Area */}
       <div className="flex-1 flex items-center justify-center p-6 relative z-10">
@@ -109,7 +108,7 @@ export default function Login() {
               </label>
               <div className="relative flex items-center group">
                 <Lock className="absolute left-4 w-4 h-4 text-zinc-500 group-focus-within:text-cyan-400 transition-colors" />        
-                <input type="password" placeholder="••••••••" className="w-full bg-black/50 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-cyan-400 focus:bg-cyan-950/10 transition-all tracking-widest shadow-inner" />
+                <input type="password" placeholder="��������" className="w-full bg-black/50 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-cyan-400 focus:bg-cyan-950/10 transition-all tracking-widest shadow-inner" />
               </div>
             </div>
 
@@ -129,6 +128,9 @@ export default function Login() {
 
       {/* Decorative Sidebar Right */}
       <div className="hidden lg:flex flex-1 flex-col justify-center items-end p-20 pr-24 border-l border-white/5 bg-gradient-to-l from-black/80 to-transparent relative z-10 text-right">
+        <Link to="/" className="absolute top-10 right-20 text-5xl font-extrabold tracking-tighter text-white flex items-center hover:scale-105 transition-transform z-50 drop-shadow-[0_0_15px_rgba(255,255,255,0.6)]" style={{ fontFamily: "'Samarkan', sans-serif" }}>
+          Parakh.AI
+        </Link>
         <div className="mb-4 inline-block px-4 py-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-400 text-xs font-bold tracking-widest uppercase shadow-[0_0_15px_rgba(59,130,246,0.2)]">
           System Secure
         </div>

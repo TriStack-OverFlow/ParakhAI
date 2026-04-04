@@ -237,6 +237,49 @@ function InferenceView() {
   const [useCamera, setUseCamera] = useState(false);
   const webcamRef = useRef<Webcam>(null);
 
+  const [isAccepting, setIsAccepting] = useState(false);
+  const [isExpressCalib, setIsExpressCalib] = useState(false);
+  const [expressFiles, setExpressFiles] = useState<File[]>([]);
+
+  const handleAcceptAsNormal = async () => {
+    if (!testImages.length || !sessionId) return;
+    setIsAccepting(true);
+    const formData = new FormData();
+    formData.append('file', testImages[0]);
+    formData.append('session_id', sessionId);
+    try {
+      const res = await axios.post(`${API_URL}/infer/accept`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      alert(`✅ Distribution updated.\nCoreset: ${res.data.stats.old_coreset_size} → ${res.data.stats.coreset_size} vectors.\nNew μ=${res.data.stats.new_mean.toFixed(2)}, σ=${res.data.stats.new_std.toFixed(2)}`);
+      setResult({ ...result, severity: 'PASS', is_defective: false, defect_bboxes: [] });
+    } catch (err) {
+      alert('Failed to accept as normal.');
+    } finally {
+      setIsAccepting(false);
+    }
+  };
+
+  const handleExpressCalibrate = async () => {
+    if(!expressFiles.length) return alert('Select replacement images.');
+    setIsExpressCalib(true);
+    const formData = new FormData();
+    expressFiles.forEach(f => formData.append('files', f));
+    formData.append('session_name', sessionId);
+    try {
+       await axios.post(`${API_URL}/calibrate`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+       alert('⚡ Express Calibration Complete! Model Hot-Swapped.');
+       setResult(null); 
+       setTestImages([]);
+       setPreview(null);
+       setExpressFiles([]);
+    } catch (err) {
+       alert('Failed express calib.');
+    } finally {
+       setIsExpressCalib(false);
+    }
+  };
+
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current?.getScreenshot();
     if (imageSrc) {
@@ -286,7 +329,10 @@ function InferenceView() {
           is_defective: true,
           severity: 'FAIL',
           anomaly_score: 412.3,
-          defect_bboxes: [{ x: 50, y: 150, w: 100, h: 80 }, { x: 300, y: 220, w: 60, h: 60 }]
+          defect_bboxes: [{ x: 50, y: 150, w: 100, h: 80 }, { x: 300, y: 220, w: 60, h: 60 }],
+          drift_status: 'domain_shift',
+          drift_window_mean: 412.3,
+          drift_window_std: 0.1
         };
         setResult(finalResult);
       } finally {
@@ -331,6 +377,27 @@ function InferenceView() {
             </div>
         </div>
       </div>
+
+      {result?.drift_status === 'domain_shift' && (
+        <div className="w-full bg-amber-500/20 border border-amber-500/50 rounded-2xl p-6 mb-8 flex flex-col items-start gap-4 animate-pulse relative overflow-hidden backdrop-blur-xl">
+           <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 to-transparent pointer-events-none" />
+           <div className="relative z-10 flex w-full justify-between items-center">
+             <h3 className="text-amber-400 font-semibold text-xl tracking-tight">⚠️ Domain Shift Detected</h3>
+             <span className="text-amber-500/70 text-sm italic font-mono">μ={(result.drift_window_mean || 0).toFixed(2)} σ={(result.drift_window_std || 0).toFixed(2)}</span>
+           </div>
+           <p className="text-amber-200/80 relative z-10">Product line appears to have changed. The last 5+ images all scored highly with low variance.</p>
+           
+           <div className="mt-2 w-full flex flex-col lg:flex-row items-center gap-4 relative z-10">
+              <label className="flex-1 w-full bg-black/40 border border-amber-500/30 p-4 rounded-xl cursor-pointer hover:bg-black/60 transition-colors flex justify-between items-center">
+                 <span className="text-sm text-zinc-400">Select new product images... ({expressFiles.length} selected)</span>
+                 <input type="file" multiple accept="image/*" onChange={(e) => setExpressFiles(Array.from(e.target.files || []))} className="hidden" />
+              </label>
+              <button disabled={isExpressCalib || expressFiles.length < 1} onClick={handleExpressCalibrate} className="w-full lg:w-auto px-6 py-4 bg-amber-500 hover:bg-amber-400 text-black font-semibold rounded-xl transition-colors disabled:opacity-50">
+                 {isExpressCalib ? 'Calibrating...' : '⚡ Express Re-Calibrate'}
+              </button>
+           </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-[1fr_400px] gap-8 rounded-2xl overflow-hidden">
           <div className="bg-white/5 border border-white/10 rounded-2xl flex flex-col items-center justify-center p-8 relative overflow-hidden group min-h-[500px]">
@@ -403,6 +470,12 @@ function InferenceView() {
                   <p className="text-sm font-semibold tracking-wide uppercase text-zinc-400 mb-2">Anomaly Score</p>
                   <p className="text-5xl font-mono text-zinc-300">{(result.anomaly_score || 0).toFixed(2)}</p>
                 </div>
+                
+                {(result.severity === 'FAIL' || result.severity === 'WARN' || result.is_defective) && result.drift_status !== 'domain_shift' && (
+                  <button disabled={isAccepting} onClick={handleAcceptAsNormal} className="mt-auto px-4 py-3 bg-green-500/10 hover:bg-green-500/20 text-green-400 border border-green-500/20 rounded-xl font-medium transition-colors text-sm w-full mx-auto shadow-inner whitespace-nowrap overflow-hidden">
+                    {isAccepting ? 'Updating Vector Space...' : '✅ Accept as Normal'}
+                  </button>
+                )}
               </div>
             )}
           </div>

@@ -6,7 +6,7 @@ import logging
 
 from parakh_ai.api.middleware import RequestLoggingMiddleware
 from parakh_ai.api.routes import calibration, inference, stream, sessions, analytics
-from parakh_ai.api.routes import ai_routes
+from parakh_ai.api.routes import ai_routes, auth
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s | ParakhAI | %(name)s | %(levelname)s | %(message)s")
 
@@ -32,6 +32,7 @@ app.include_router(stream.router, prefix="/api/v1/stream")
 app.include_router(sessions.router, prefix="/api/v1/sessions")
 app.include_router(analytics.router, prefix="/api/v1/analytics")
 app.include_router(ai_routes.router, prefix="/api/v1/ai")
+app.include_router(auth.router, prefix="/api/v1/auth")
 
 @app.get("/health")
 def health_check():

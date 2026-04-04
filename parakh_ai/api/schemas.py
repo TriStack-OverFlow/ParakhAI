@@ -24,6 +24,21 @@ class InferenceResponseModel(BaseModel):
     drift_window_mean: Optional[float] = 0.0
     drift_window_std: Optional[float] = 0.0
 
+# ── Auth Schemas ──────────────────────────────────────────────
+class GoogleTokenRequest(BaseModel):
+    token: str
+
+class UserResponse(BaseModel):
+    id: str
+    email: str
+    name: str
+    picture: Optional[str] = None
+    role: str = "operator"
+
+class AuthResponseModel(BaseModel):
+    token: str
+    user: UserResponse
+
 class CalibrationResponseModel(BaseModel):
     session_id: str
     calibration_time_s: float

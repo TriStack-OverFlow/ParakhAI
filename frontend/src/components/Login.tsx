@@ -12,10 +12,12 @@ export default function Login() {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const [status, setStatus] = useState<string>('');
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+
   const handleGoogleSuccess = async (tokenResponse: any) => {
     try {
       setStatus('Processing...');
-      const res = await fetch(import.meta.env.VITE_API_URL + '/auth/google', {  
+      const res = await fetch(API_URL + '/auth/google', {  
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: tokenResponse.credential || tokenResponse.access_token })

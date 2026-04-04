@@ -51,6 +51,18 @@ def generate_heatmap(
     # 2. Gaussian Blur
     anomaly_map_smoothed = gaussian_filter(anomaly_map_resized, sigma=blur_sigma)
     
+    # 2.5 Suppress Edge/Background Bloom (Hackathon Fix)
+    # The anomaly map is often stretched over the full webcam frame causing the
+    # background/edges to artificially glow. We enforce a strict 15% zero-margin.
+    margin_y = int(img_h * 0.15)
+    margin_x = int(img_w * 0.15)
+    if margin_y > 0 and margin_x > 0:
+        anomaly_map_smoothed[:margin_y, :] = 0
+        anomaly_map_smoothed[-margin_y:, :] = 0
+        anomaly_map_smoothed[:, :margin_x] = 0
+        anomaly_map_smoothed[:, -margin_x:] = 0
+
+    
     # 3. Scale dynamically to standard thresholds instead of image p99 noise
     # Any Z-score above 1.5x fail_threshold will be saturated 100% RED.
     # A Z-score of 0 is 0% RED (Blue). This stops clean images from turning Red.

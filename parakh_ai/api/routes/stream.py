@@ -6,17 +6,19 @@ import json
 import base64
 
 from parakh_ai.pipeline.inference import InferencePipeline
+from parakh_ai.storage.model_store import ModelStore
+from parakh_ai.storage.defect_log import DefectLog
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
-# Re-use existing pipeline singleton conceptually
-from parakh_ai.api.dependencies import get_pipeline
+store = ModelStore()
+log = DefectLog()
+pipeline = InferencePipeline(store, log)
 
 @router.websocket("/live")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
-    pipeline = get_pipeline()
     
     # We require a session_id to be sent first, or we can just expect JSON messages
     session_id = None

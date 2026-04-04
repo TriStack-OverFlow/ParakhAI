@@ -21,15 +21,18 @@ class AnalyzeRequest(BaseModel):
     defect_coverage_pct: Optional[float] = 0.0
 
 
+class AdvancedMetrics(BaseModel):
+    geometric_spread: str
+    edge_variance: str
+    production_impact: str
+
 class AnalyzeResponse(BaseModel):
-    defect_type: str
-    location: str
-    area_estimate: str
-    root_cause: str
-    severity: str
-    confidence: float
-    recommended_action: str
     summary: str
+    defect_type: str
+    root_cause: str
+    severity_index: float
+    recommended_action: str
+    advanced_metrics: AdvancedMetrics
     model: str
     z_score: float
     error: Optional[str] = None

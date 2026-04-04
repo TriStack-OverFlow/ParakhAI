@@ -4,6 +4,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import Webcam from 'react-webcam';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -149,11 +150,11 @@ export default function ParallaxDashboard() {
       {/* Floating Sidebar Menu */}
       <aside className="fixed left-6 top-1/2 -translate-y-1/2 w-64 bg-black/40 backdrop-blur-2xl border border-white/10 rounded-[2rem] flex flex-col p-4 shadow-[0_0_50px_rgba(0,0,0,0.5)] z-50">
         <div className="mb-6 p-4">
-          <h2 className="text-2xl font-extrabold tracking-tighter text-white flex items-center">
-            <BrainCircuit className="w-6 h-6 mr-3 text-cyan-400" />
-            Parakh.AI
-          </h2>
-          <p className="text-[10px] text-zinc-400 mt-2 font-mono uppercase tracking-widest">{user?.name || 'Administrator'} &bull; Edge Node</p>
+            <Link to="/" className="text-3xl font-extrabold tracking-tighter text-white flex items-center hover:scale-105 transition-transform" style={{ fontFamily: "'samarkan', sans-serif" }}>
+              <BrainCircuit className="w-8 h-8 mr-3 text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.6)]" />
+              Parakh.AI
+            </Link>
+            <p className="text-[10px] text-zinc-400 mt-2 font-mono uppercase tracking-widest">{user?.name || 'Administrator'} &bull; Edge Node</p>
         </div>
 
         <div className="flex flex-col gap-2">

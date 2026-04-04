@@ -1,4 +1,4 @@
-﻿import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, User, Building2, Zap, CheckCircle2 } from 'lucide-react';
 import ThreeBackground from './ThreeBackground';
 import { useState, useEffect, useRef } from 'react';
@@ -16,7 +16,8 @@ export default function Register() {
   const handleGoogleSuccess = async (tokenResponse: any) => {
     try {
       setStatus('Processing...');
-      const res = await fetch(import.meta.env.VITE_API_URL + '/auth/google', {  
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+      const res = await fetch(API_URL + '/auth/google', {  
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: tokenResponse.credential || tokenResponse.access_token })

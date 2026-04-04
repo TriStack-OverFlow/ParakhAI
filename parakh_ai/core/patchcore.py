@@ -359,7 +359,7 @@ class PatchCore(BaseAnomalyModel):
         w_mean = float(np.mean(self._z_window))
         w_std  = float(np.std(self._z_window))
 
-        if len(self._z_window) >= 5 and w_mean > 2.0 and w_std < 0.5:
+        if len(self._z_window) >= 4 and w_mean > 2.0 and w_std < 0.5:
             drift_status = "domain_shift"
 
         return {

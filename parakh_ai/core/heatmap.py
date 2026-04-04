@@ -30,7 +30,7 @@ def generate_heatmap(
     threshold: float = 1.0, 
     colormap: int = cv2.COLORMAP_JET, 
     alpha: float = 0.4, 
-    blur_sigma: float = 4.0, 
+    blur_sigma: float = 2.0, 
     min_contour_area: int = 50,
     warn_threshold: float = 0.5,
     fail_threshold: float = 0.75
@@ -51,15 +51,10 @@ def generate_heatmap(
     # 2. Gaussian Blur
     anomaly_map_smoothed = gaussian_filter(anomaly_map_resized, sigma=blur_sigma)
     
-    # 3. Scale to [0, 255]
-    # We scale so the 99th-percentile anomaly patch maps to full red.
-    # This means even a subtly crumpled paper where max Z ≈ 3.7 but most
-    # patches sit around Z ≈ 0.4 will still show a vivid red hotspot
-    # proportional to the actual defect, not capped by a fixed threshold.
-    p99 = float(np.percentile(anomaly_map_smoothed, 99))
-    # Fall back: if the image is nearly all-normal, use the fail_threshold
-    # so we don't divide by zero or over-amplify pure noise.
-    max_val = max(p99, fail_threshold * 0.5, 1e-5)
+    # 3. Scale dynamically to standard thresholds instead of image p99 noise
+    # Any Z-score above 1.5x fail_threshold will be saturated 100% RED.
+    # A Z-score of 0 is 0% RED (Blue). This stops clean images from turning Red.
+    max_val = max(fail_threshold * 1.5, 1e-5)
     normalized_map = np.clip(anomaly_map_smoothed / max_val, 0.0, 1.0)
     
     # Mild gamma to slightly lift mid-range anomalies (1.4 instead of 2.0)

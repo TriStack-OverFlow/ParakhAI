@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+ï»¿import { useEffect, useRef, useState, useCallback } from 'react';
 import { Camera, Activity, Video, RefreshCw, Layers, BrainCircuit, CheckCircle2 } from 'lucide-react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -299,7 +299,7 @@ function InferenceView() {
       const res = await axios.post(`${API_URL}/infer/accept`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      alert(`? Distribution updated.\nCoreset: ${res.data.stats.old_coreset_size} ? ${res.data.stats.coreset_size} vectors.\nNew µ=${res.data.stats.new_mean.toFixed(2)}, s=${res.data.stats.new_std.toFixed(2)}`);
+      alert(`? Distribution updated.\nCoreset: ${res.data.stats.old_coreset_size} ? ${res.data.stats.coreset_size} vectors.\nNew ï¿½=${res.data.stats.new_mean.toFixed(2)}, s=${res.data.stats.new_std.toFixed(2)}`);
       setResult({ ...result, severity: 'PASS', is_defective: false, defect_bboxes: [] });
     } catch (err: any) {
       alert(err.response?.data?.detail || 'Failed to accept as normal.');
@@ -442,7 +442,7 @@ function InferenceView() {
              <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 to-transparent pointer-events-none" />
              <div className="relative z-10 flex w-full justify-between items-center">
                <h3 className="text-amber-400 font-semibold text-xl tracking-tight">?? Domain Shift Detected</h3>
-               <span className="text-amber-500/70 text-sm italic font-mono">µ={(result.drift_window_mean || 0).toFixed(2)} s={(result.drift_window_std || 0).toFixed(2)}</span>
+               <span className="text-amber-500/70 text-sm italic font-mono">ï¿½={(result.drift_window_mean || 0).toFixed(2)} s={(result.drift_window_std || 0).toFixed(2)}</span>
              </div>
              <p className="text-amber-200/80 relative z-10">Product line appears to have changed. The last 5+ images all scored highly with low variance.</p>
 

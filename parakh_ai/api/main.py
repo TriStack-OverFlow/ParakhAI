@@ -36,7 +36,6 @@ app.include_router(sessions.router, prefix="/api/v1/sessions")
 app.include_router(analytics.router, prefix="/api/v1/analytics")
 app.include_router(auth.router, prefix="/api/v1/auth")
 app.include_router(ai_routes.router, prefix="/api/v1/ai")
-app.include_router(auth.router, prefix="/api/v1/auth")
 
 @app.on_event("startup")
 async def startup_event():
